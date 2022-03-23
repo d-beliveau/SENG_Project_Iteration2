@@ -23,8 +23,10 @@ package controller;
 
 import org.lsmr.selfcheckout.Barcode;
 import org.lsmr.selfcheckout.BarcodedItem;
+import org.lsmr.selfcheckout.Card.CardData;
 import org.lsmr.selfcheckout.devices.AbstractDevice;
 import org.lsmr.selfcheckout.devices.BarcodeScanner;
+import org.lsmr.selfcheckout.devices.CardReader;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.SimulationException;
 import org.lsmr.selfcheckout.products.BarcodedProduct;
@@ -35,9 +37,10 @@ import java.util.Hashtable;
 import java.util.List;
 import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
 import org.lsmr.selfcheckout.devices.observers.BarcodeScannerObserver;
+import org.lsmr.selfcheckout.devices.observers.CardReaderObserver;
 
 // Controller class for 'customer scans item' use case
-public class ScanItem implements BarcodeScannerObserver{
+public class ScanItem implements BarcodeScannerObserver, CardReaderObserver{
 
 	private Dictionary<Barcode, BarcodedProduct> Products = new Hashtable<Barcode, BarcodedProduct>();
 	private	List <BarcodedItem> Scanneditems = new ArrayList<BarcodedItem>();
@@ -53,13 +56,13 @@ public class ScanItem implements BarcodeScannerObserver{
 	
 	public ScanItem(SelfCheckoutStation station) {
 		this.station = station;
-		station.scanner.attach(this);
+		station.mainScanner.attach(this);
 	}
 	
 	//Construct scanner observer from checkout station
 	public boolean scanAnItem(BarcodedItem item) {
 		
-		station.scanner.scan(item);
+		station.mainScanner.scan(item);
 		if (this.scanResult() == true) {
 			Scanneditems.add(item);
 			
@@ -98,7 +101,7 @@ public class ScanItem implements BarcodeScannerObserver{
 		return Products;
 	}
 	
-	//Implemented methods from the observer
+	//BARCODE OBSERVERS IMPLEMENTATION
 	@Override
 	public void enabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
 		// TODO Auto-generated method stub
@@ -150,5 +153,37 @@ public class ScanItem implements BarcodeScannerObserver{
 	public BigDecimal GetBillPrice() {
 		TallyBillPrice();
 		return billprice;
+	}
+
+	
+	//CARD READER OBSERVER IMPLEMENTED METHODS
+	@Override
+	public void cardInserted(CardReader reader) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cardRemoved(CardReader reader) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cardTapped(CardReader reader) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cardSwiped(CardReader reader) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cardDataRead(CardReader reader, CardData data) {
+		// TODO Auto-generated method stub
+		
 	}
 }
