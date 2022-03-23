@@ -35,6 +35,7 @@ public class CustomerCheckout{
 	
 	public CustomerCheckout(SelfCheckoutStation station) {
 		this.station = station;
+		beforeCheckout();
 	}
 	
 	

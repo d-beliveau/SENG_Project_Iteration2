@@ -120,7 +120,7 @@ public class ScanItem implements BarcodeScannerObserver{
 		this.scanned = true;
 	}
 	
-	//Gives whether item was succesfully scanned
+	//Gives whether item was successfully scanned
 	public boolean scanResult() {
 		return this.scanned;
 	}
@@ -140,32 +140,22 @@ public class ScanItem implements BarcodeScannerObserver{
 		return Products.get(currentcode).getPrice();
 	}
 	
-	//Loop to add product prices to billprice
+	//Loop to add product prices to bill price
 	private void TallyBillPrice() {
 		billprice = new BigDecimal(0.00);
 		for (int i = 0; i < Scanneditems.size(); i++) {
 			productprice = ItemAsProductPrice(Scanneditems.get(i).getBarcode());
 			billprice = billprice.add(productprice);
 		}
+		
 	}
 	
-	
-	//Loop to add product prices to bill price but subtract partial payment
-	public void TallyBillPriceAfterPartialPayment(BigDecimal price) {
-		billprice = new BigDecimal(0.00);
-		
-		for (int i = 0; i < Scanneditems.size(); i++) {
-			productprice = ItemAsProductPrice(Scanneditems.get(i).getBarcode());
-			billprice = billprice.add(productprice);
-		}
-		
-		billprice = billprice.subtract(price);
-	}
 	
 	
 	//BillPrice Getter
-	public BigDecimal GetBillPrice() {
+	public BigDecimal GetBillPrice(BigDecimal partialPayment) {
 		TallyBillPrice();
+		billprice = billprice.subtract(partialPayment);
 		return billprice;
 	}
 	
