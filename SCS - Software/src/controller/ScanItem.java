@@ -40,7 +40,7 @@ import org.lsmr.selfcheckout.devices.observers.BarcodeScannerObserver;
 import org.lsmr.selfcheckout.devices.observers.CardReaderObserver;
 
 // Controller class for 'customer scans item' use case
-public class ScanItem implements BarcodeScannerObserver, CardReaderObserver{
+public class ScanItem implements BarcodeScannerObserver{
 
 	private Dictionary<Barcode, BarcodedProduct> Products = new Hashtable<Barcode, BarcodedProduct>();
 	private	List <BarcodedItem> Scanneditems = new ArrayList<BarcodedItem>();
@@ -156,34 +156,4 @@ public class ScanItem implements BarcodeScannerObserver, CardReaderObserver{
 	}
 
 	
-	//CARD READER OBSERVER IMPLEMENTED METHODS
-	@Override
-	public void cardInserted(CardReader reader) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void cardRemoved(CardReader reader) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void cardTapped(CardReader reader) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void cardSwiped(CardReader reader) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void cardDataRead(CardReader reader, CardData data) {
-		// TODO Auto-generated method stub
-		
-	}
 }
