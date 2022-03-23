@@ -1,0 +1,1 @@
+This folder contains miscellaneous supporting documents showing our team planning. We are commiting this only for documentation purposes, nothing here needs to be marked.
