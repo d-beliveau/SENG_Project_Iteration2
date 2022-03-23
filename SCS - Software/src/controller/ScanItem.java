@@ -149,10 +149,29 @@ public class ScanItem implements BarcodeScannerObserver{
 		}
 	}
 	
+	
+	//Loop to add product prices to bill price but subtract partial payment
+	public void TallyBillPriceAfterPartialPayment(BigDecimal price) {
+		billprice = new BigDecimal(0.00);
+		
+		for (int i = 0; i < Scanneditems.size(); i++) {
+			productprice = ItemAsProductPrice(Scanneditems.get(i).getBarcode());
+			billprice = billprice.add(productprice);
+		}
+		
+		billprice = billprice.subtract(price);
+	}
+	
+	
 	//BillPrice Getter
 	public BigDecimal GetBillPrice() {
 		TallyBillPrice();
 		return billprice;
+	}
+	
+	//BillPrice Setter
+	public void SetBillPrice(BigDecimal price) {
+		billprice = price;
 	}
 
 	

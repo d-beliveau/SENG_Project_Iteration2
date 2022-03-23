@@ -1,10 +1,10 @@
 package controller;
 
+import java.math.BigDecimal;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 
-import javax.smartcardio.Card;
 
 import org.lsmr.selfcheckout.Barcode;
 import org.lsmr.selfcheckout.Card.CardData;
@@ -45,16 +45,31 @@ public class MembershipCard implements CardReaderObserver{
 		return loyaltyPointMap.get(cardNumber);
 	}
 	
+	//Return the cash discount you get
+	public int cashDiscount(int points) {
+		int userPoint = loyaltyPointMap.get(cardNumber);
+		int discount = userPoint/100;
+		int newLoyaltyPoint = userPoint - (discount * 100);
+		loyaltyPointMap.put(cardNumber, newLoyaltyPoint);
+		return discount;
+	}
+	
+	public void gainLoyaltyPoints(BigDecimal price) {
+		int addedPoint = (price.intValue()/10) * 100;
+		int newLoyaltyPoint = loyaltyPointMap.get(cardNumber) + addedPoint;
+		loyaltyPointMap.put(cardNumber, newLoyaltyPoint);
+	}
+	
 	
 	@Override
 	public void enabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// Ignore this
+		// Ignore
 		
 	}
 
 	@Override
 	public void disabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// Ignore this
+		// Ignore
 		
 	}
 
@@ -80,6 +95,7 @@ public class MembershipCard implements CardReaderObserver{
 		// Ignore
 		
 	}
+
 
 	@Override
 	public void cardDataRead(CardReader reader, CardData data) {
