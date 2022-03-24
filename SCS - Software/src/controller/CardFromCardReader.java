@@ -23,8 +23,8 @@ public class CardFromCardReader implements CardReaderObserver{
 	
 	//Map card number to loyalty point
 	private  HashMap<String, Integer> loyaltyPointMap = new HashMap<>();
-	private   HashMap<String , Integer> creditCardMap = new HashMap<>();
-	private   HashMap<String , Integer> debitCardMap = new HashMap<>();
+	private   HashMap<String , BigDecimal> creditCardMap = new HashMap<>();
+	private   HashMap<String , BigDecimal> debitCardMap = new HashMap<>();
 	
 	private String cardNumber;
 	
@@ -33,29 +33,41 @@ public class CardFromCardReader implements CardReaderObserver{
 		station.cardReader.attach(this);
 	}
 	
-	//Set the hash table of credit Card Map
-	public void  setLoyaltyPointMap(HashMap<String, Integer> map) {
-		creditCardMap = map;
-	}
+
+	//DEBIT CARD METHOD
 	
-	//Set the hash table of debit Card Map
-	public void  setCreditCardMap(HashMap<String, Integer> map) {
+	//Set the hash table of debit card map
+	public void  setDebitCardMap(HashMap<String, BigDecimal> map) {
 		debitCardMap = map;
 	}
 	
-	//Set the hash table of loyalty point map
-	public void  setDebitCardMap(HashMap<String, Integer> map) {
+	
+	//Removes money from your debit account 
+	public void payWithDebit(String CardNum, BigDecimal payment) {
+	
+	}
+	
+	
+	//CREDIT CARD METHOD
+	
+	//Set the hash table of credit Card Map
+	public void  setCreditCardMap(HashMap<String, BigDecimal> map) {
+		creditCardMap = map;
+	}
+	
+	//Adds more credit to your credit card account
+	public void payWithCredit(String CardNum, BigDecimal payment) {
+	}
+	
+	
+	
+	
+
+	//MEMBERSHIP CARD METHOD
+
+	//Set the hash table of loyalty point Map
+	public void  setLoyaltyPointMap(HashMap<String, Integer> map) {
 		loyaltyPointMap = map;
-	}
-	
-	//Set customer points
-	public void setPoints(String cardNum, int points) {
-		loyaltyPointMap.put(cardNum, points);
-	}
-	
-	//Get the customer points
-	public int getPoints() {
-		return loyaltyPointMap.get(cardNumber);
 	}
 	
 	//Return the cash discount you get
@@ -67,11 +79,27 @@ public class CardFromCardReader implements CardReaderObserver{
 		return discount;
 	}
 	
+
+	
+	//Set customer points
+	public void setPoints(String cardNum, int points) {
+		loyaltyPointMap.put(cardNum, points);
+	}
+	
+	//Get the customer points
+	public int getPoints() {
+		return loyaltyPointMap.get(cardNumber);
+	}
+	
+	
 	public void gainLoyaltyPoints(BigDecimal price) {
 		int addedPoint = (price.intValue()/10) * 100;
 		int newLoyaltyPoint = loyaltyPointMap.get(cardNumber) + addedPoint;
 		loyaltyPointMap.put(cardNumber, newLoyaltyPoint);
 	}
+	
+
+	
 	
 	
 	@Override
@@ -113,9 +141,8 @@ public class CardFromCardReader implements CardReaderObserver{
 	@Override
 	public void cardDataRead(CardReader reader, CardData data) {
 		//Retrieve the card number
-		if(data.getType().equals("Membership")) {
-			cardNumber = data.getNumber();
-		}
+		cardNumber = data.getNumber();
+		
 	}
 	
 
