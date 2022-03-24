@@ -9,9 +9,9 @@ Implements Hardware v2.0
 Directory:
 SCS - Software            (control software)
 SCS - Software - Test     (JUnit test suite)
-Documents                 (miscellaneous group documents, not for marks)
 
 Principle Branches:
 1. payment
 2. bagging
 3. scanning
+4. change
