@@ -115,7 +115,7 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	
 	
 	// Principle method for determining change, calls other methods for calculation
-	// Return type may be changed later
+	// void return type is tentative
 	public void determineChange(BigDecimal paid, BigDecimal total) {
 		
 		// Using other methods to calculate change due in array lists of integers (banknotes) and BigDecimal (coins)

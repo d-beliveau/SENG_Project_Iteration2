@@ -138,6 +138,13 @@ public class TestPayCash {
 	}
 	
 	
+	@Test (timeout = 500)
+	public void testDetermineChange() {
+		BigDecimal paid = new BigDecimal(25.00);
+		BigDecimal cost = new BigDecimal(17.89);
+		
+	}
+	
 	@Test
 	public void testValidBanknoteInserted() throws DisabledException{
 
