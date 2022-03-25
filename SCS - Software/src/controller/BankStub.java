@@ -13,11 +13,14 @@ public class BankStub {
 	
 	public BigDecimal getCreditRemaining(CardData data) {
 		//obtain information from third party financial institution
+		
+		//obtaining funds remaining
 		availableFunds = new BigDecimal(((new Random().nextDouble() * (creditLimit)) + 0.01));
 		availableFunds.setScale(2);
 		
 		return availableFunds;
 	}
+	
 	/*
 	 * Needed utility:
 	 * Credit limit
