@@ -10,11 +10,8 @@ import org.lsmr.selfcheckout.Card.CardData;
 
 public class BankStub {
 	private BigDecimal availableFunds;
-	private double creditLimit = 1500;
+	private double creditLimit;
 	
-	
-	
-	private Card card = new Card("debit", "1732785", "Person", "890","7483", true, true);
 	
 	public BankStub() {}
 	
@@ -22,7 +19,7 @@ public class BankStub {
 		//obtain information from third party financial institution
 		
 		//obtaining funds remaining
-		availableFunds = new BigDecimal(((new Random().nextDouble() * (1500)) + 0.01)).setScale(2, RoundingMode.HALF_DOWN);
+		availableFunds = new BigDecimal(((new Random().nextDouble() * (creditLimit)) + 0.01)).setScale(2, RoundingMode.HALF_DOWN);
 		return availableFunds;
 	}
 
