@@ -1,7 +1,6 @@
 package controller;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Random;
 
 import org.lsmr.selfcheckout.Card.CardData;
