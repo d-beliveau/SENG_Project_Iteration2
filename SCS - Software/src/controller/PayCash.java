@@ -18,8 +18,7 @@ Instructor: Robert Walker
 Date: 20 March 2022
 Assignment: Project, Iteration 01
 ******************************************************************************/
-// 
-//Haris
+
 package controller;
 
 import java.math.BigDecimal;
