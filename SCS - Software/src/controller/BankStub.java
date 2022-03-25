@@ -1,6 +1,6 @@
 package controller;
 
-public class bankStub {
+public class BankStub {
 	private int availableFunds;
 	/*
 	 * Needed utility:
