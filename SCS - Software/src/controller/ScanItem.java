@@ -23,8 +23,10 @@ package controller;
 
 import org.lsmr.selfcheckout.Barcode;
 import org.lsmr.selfcheckout.BarcodedItem;
+import org.lsmr.selfcheckout.Card.CardData;
 import org.lsmr.selfcheckout.devices.AbstractDevice;
 import org.lsmr.selfcheckout.devices.BarcodeScanner;
+import org.lsmr.selfcheckout.devices.CardReader;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.SimulationException;
 import org.lsmr.selfcheckout.products.BarcodedProduct;
@@ -35,6 +37,7 @@ import java.util.Hashtable;
 import java.util.List;
 import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
 import org.lsmr.selfcheckout.devices.observers.BarcodeScannerObserver;
+import org.lsmr.selfcheckout.devices.observers.CardReaderObserver;
 
 // Controller class for 'customer scans item' use case
 public class ScanItem implements BarcodeScannerObserver{
@@ -53,13 +56,13 @@ public class ScanItem implements BarcodeScannerObserver{
 	
 	public ScanItem(SelfCheckoutStation station) {
 		this.station = station;
-		station.scanner.attach(this);
+		station.mainScanner.attach(this);
 	}
 	
 	//Construct scanner observer from checkout station
 	public boolean scanAnItem(BarcodedItem item) {
 		
-		station.scanner.scan(item);
+		station.mainScanner.scan(item);
 		if (this.scanResult() == true) {
 			Scanneditems.add(item);
 			
@@ -98,7 +101,7 @@ public class ScanItem implements BarcodeScannerObserver{
 		return Products;
 	}
 	
-	//Implemented methods from the observer
+	//BARCODE OBSERVERS IMPLEMENTATION
 	@Override
 	public void enabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
 		// TODO Auto-generated method stub
@@ -117,7 +120,7 @@ public class ScanItem implements BarcodeScannerObserver{
 		this.scanned = true;
 	}
 	
-	//Gives whether item was succesfully scanned
+	//Gives whether item was successfully scanned
 	public boolean scanResult() {
 		return this.scanned;
 	}
@@ -137,18 +140,29 @@ public class ScanItem implements BarcodeScannerObserver{
 		return Products.get(currentcode).getPrice();
 	}
 	
-	//Loop to add product prices to billprice
+	//Loop to add product prices to bill price
 	private void TallyBillPrice() {
 		billprice = new BigDecimal(0.00);
 		for (int i = 0; i < Scanneditems.size(); i++) {
 			productprice = ItemAsProductPrice(Scanneditems.get(i).getBarcode());
 			billprice = billprice.add(productprice);
 		}
+		
 	}
 	
+	
+	
 	//BillPrice Getter
-	public BigDecimal GetBillPrice() {
+	public BigDecimal GetBillPrice(BigDecimal partialPayment) {
 		TallyBillPrice();
+		billprice = billprice.subtract(partialPayment);
 		return billprice;
 	}
+	
+	//BillPrice Setter
+	public void SetBillPrice(BigDecimal price) {
+		billprice = price;
+	}
+
+	
 }
