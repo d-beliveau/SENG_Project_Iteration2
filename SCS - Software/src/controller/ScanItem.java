@@ -153,6 +153,7 @@ public class ScanItem implements BarcodeScannerObserver{
 	
 	
 	//BillPrice Getter
+	//Recalculates correct bill price even after partial payment
 	public BigDecimal GetBillPrice(BigDecimal partialPayment) {
 		TallyBillPrice();
 		billprice = billprice.subtract(partialPayment);
