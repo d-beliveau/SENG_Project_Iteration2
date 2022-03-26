@@ -21,10 +21,14 @@ Assignment: Project, Iteration 01
 
 package controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lsmr.selfcheckout.BarcodedItem;
 import org.lsmr.selfcheckout.Item;
 import org.lsmr.selfcheckout.devices.AbstractDevice;
 import org.lsmr.selfcheckout.devices.ElectronicScale;
+import org.lsmr.selfcheckout.devices.OverloadException;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.SimulationException;
 import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
@@ -33,10 +37,13 @@ import org.lsmr.selfcheckout.devices.observers.ElectronicScaleObserver;
 //Control software for 'customer bags an item' use case 
 public class BaggingArea implements ElectronicScaleObserver{
    final private SelfCheckoutStation station;
-   final private ElectronicScale scale;
+   final private ElectronicScale baggingArea;
    private Item item;
    private double currentWeight;
    private boolean overloaded;
+   
+   // change
+   private ScanItem theScanner;
 
    @Override
    public void enabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
@@ -56,18 +63,18 @@ public class BaggingArea implements ElectronicScaleObserver{
    }
 
    @Override
-   public void overload(ElectronicScale scale) {
+   public void overload(ElectronicScale baggingArea) {
        overloaded = true;
    }
 
    @Override
-   public void outOfOverload(ElectronicScale scale) {
+   public void outOfOverload(ElectronicScale baggingArea) {
        overloaded = false;
    }
 
    // Getter for scale, used in testing
-   public ElectronicScale getScale() {
-       return scale;
+   public ElectronicScale getBaggingAreaScale() {
+       return baggingArea;
    }
 
    // Getter for item, used in testing
@@ -83,15 +90,18 @@ public class BaggingArea implements ElectronicScaleObserver{
    // Set up the scale and attach the observer
    public BaggingArea(SelfCheckoutStation station) {
        this.station = station;
-       scale = this.station.scale;
-       getScale().attach(this);
-       getScale().enable();
+       baggingArea = this.station.baggingArea; // baggingArea is the scale in baggingArea
+       getBaggingAreaScale().attach(this);
+       getBaggingAreaScale().enable();
+       
+       // change
+       theScanner = new ScanItem(station); // only exists once the baggibgArea is linked to the station
    }
 
    // Get scanned item from scanner
    public void scanBaggingItem(BarcodedItem barcodedItem) {
        this.item = barcodedItem;
-       station.scanner.disable();
+       station.mainScanner.disable();
    }
 
    // Simulate placing an item into bagging area
@@ -99,13 +109,44 @@ public class BaggingArea implements ElectronicScaleObserver{
        if (item == null)
            throw new SimulationException("Trying to place an empty item into bagging area.");
        else
-           getScale().add(item);
+           getBaggingAreaScale().add(item);
    }
-
+   
    // Check if the weight added on scale equals to the weight of item
    private void checkIfItemPlaced(double weightInGrams) {
        if (weightInGrams - currentWeight == item.getWeight()) {
-           station.scanner.enable();
+           station.mainScanner.enable();
        }
+   }
+   
+   
+ //------------------------------------------------------------------------------------------------------------------------------------------
+   // customer adding bag method
+   public void addCustomerBag() throws OverloadException{
+	   double bagWeight = baggingArea.getCurrentWeight() - currentWeight;
+	   currentWeight = bagWeight;
+   }
+   
+   // i am considering an item has to be bagged right after being scanned
+   public void bagItemAfterScanning()
+   {
+	// copying scannedLists for modification
+	   int lengthList = theScanner.getScanneditems().size();
+	   List <BarcodedItem> itemsToBeBagged = new ArrayList<BarcodedItem>();
+	   for(int j = 0; j < lengthList; j++)
+	   {
+		   itemsToBeBagged.add(theScanner.getScanneditems().get(j));
+	   }
+	   
+	   if(itemsToBeBagged.isEmpty());
+		   // no items to be bagged 
+	   else
+	   {
+		   placeItem(itemsToBeBagged.get(0));
+		   // have to check if this item is actually placed else throw exception
+		   // MORE CODE TO ADD RIGHT HERE
+		   
+		   itemsToBeBagged.remove(0); // removing item after bagging
+	   }
    }
 }
