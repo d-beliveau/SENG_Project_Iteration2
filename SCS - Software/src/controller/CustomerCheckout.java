@@ -30,16 +30,34 @@ import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 
 // Control software for 'customer wishes to checkout' use case 
 public class CustomerCheckout{
+	
+	private SelfCheckoutStation station;
+	
 	public CustomerCheckout(SelfCheckoutStation station) {
-		station.scanner.disable();
-		station.scale.disable();
+		this.station = station;
+		beforeCheckout();
+	}
+	
+	
+	public void beforeCheckout() {
+		station.mainScanner.enable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+		station.cardReader.disable();
+	}
+	
+	
+	public void customerFinishAddingItem() {
+		station.mainScanner.disable();
 		station.coinSlot.enable();
-		station.coinValidator.enable();
-		station.coinStorage.enable();
-		station.coinTray.enable();
 		station.banknoteInput.enable();
-		station.banknoteValidator.enable();
-		station.banknoteStorage.enable();
-		station.banknoteOutput.enable();
+		station.cardReader.enable();
+	}
+	
+	public void additionItemAfterPartialPayment() {
+		station.mainScanner.enable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+		station.cardReader.disable();
 	}
 }
