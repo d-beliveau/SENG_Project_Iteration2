@@ -31,10 +31,14 @@ import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.SimulationException;
 import org.lsmr.selfcheckout.products.BarcodedProduct;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
 import org.lsmr.selfcheckout.devices.observers.BarcodeScannerObserver;
 import org.lsmr.selfcheckout.devices.observers.CardReaderObserver;
@@ -49,6 +53,7 @@ public class ScanItem implements BarcodeScannerObserver{
 	private BigDecimal billprice;
 	private BigDecimal productprice;
 	private BarcodedProduct p;
+	private AtomicBoolean hasItemBeenBagged = new AtomicBoolean();
 	
 	private SelfCheckoutStation station;
 
@@ -57,6 +62,7 @@ public class ScanItem implements BarcodeScannerObserver{
 	public ScanItem(SelfCheckoutStation station) {
 		this.station = station;
 		station.mainScanner.attach(this);
+		hasItemBeenBagged.set(false);
 	}
 	
 	//Construct scanner observer from checkout station
@@ -74,6 +80,8 @@ public class ScanItem implements BarcodeScannerObserver{
 		} else {
 			return false;
 		}
+		
+		
 	}
 	
 	//Add product to product list
@@ -118,6 +126,9 @@ public class ScanItem implements BarcodeScannerObserver{
 	public void barcodeScanned(BarcodeScanner barcodeScanner, Barcode barcode) {
 		// TODO Auto-generated method stub
 		this.scanned = true;
+		station.mainScanner.disable();
+		MultithreadingDemo waitForCustomer = new MultithreadingDemo(station, hasItemBeenBagged);
+		waitForCustomer.start();
 	}
 	
 	//Gives whether item was successfully scanned
@@ -150,6 +161,10 @@ public class ScanItem implements BarcodeScannerObserver{
 		
 	}
 	
+	public boolean getHasItemBeenBagged() {
+		return hasItemBeenBagged.get();
+	}
+	
 	
 	
 	//BillPrice Getter
@@ -163,6 +178,34 @@ public class ScanItem implements BarcodeScannerObserver{
 	public void SetBillPrice(BigDecimal price) {
 		billprice = price;
 	}
-
 	
+}
+
+class MultithreadingDemo extends Thread {
+	private SelfCheckoutStation station;
+	private AtomicBoolean hasItemBeenBagged;
+	
+	public MultithreadingDemo(SelfCheckoutStation station, AtomicBoolean hasItemBeenBagged) {
+		this.station = station;
+		this.hasItemBeenBagged = hasItemBeenBagged;
+	}
+	
+    public void run()
+    {
+    	
+		double duration =0;
+		LocalDateTime initialTime = LocalDateTime.now();
+		hasItemBeenBagged.set(false);
+		
+	
+		while(duration < 5) {
+			duration = ChronoUnit.SECONDS.between(initialTime, LocalDateTime.now());
+			//baggingArea.bagItemAfterScanning
+			if(station.mainScanner.isDisabled() == false) { //if scanner is enabled
+				hasItemBeenBagged.set(true);;
+				break;
+			}
+		}
+		
+    }
 }
