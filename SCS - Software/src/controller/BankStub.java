@@ -53,7 +53,7 @@ public class BankStub {
 		return debitFundsAvailableMap.get(cardNumber);
 	}
 	
-	//to get a randomized amount of funds available
+	//to get a randomized amount of funds available (for testint of needed)
 	public BigDecimal getFundsRemaining(String cardNumber) {
 		//obtain information from third party financial institution
 		
