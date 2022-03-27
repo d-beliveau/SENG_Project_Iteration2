@@ -38,9 +38,10 @@ import org.lsmr.selfcheckout.devices.observers.ElectronicScaleObserver;
 public class BaggingArea implements ElectronicScaleObserver{
    final private SelfCheckoutStation station;
    final private ElectronicScale baggingArea;
-   private Item item;
    private double currentWeight;
    private boolean overloaded;
+   
+   // removed Item has a global variable (change) 
    
    // change
    private ScanItem theScanner;
@@ -58,7 +59,7 @@ public class BaggingArea implements ElectronicScaleObserver{
    @Override
    // Will be called when the scale detects changes in weight
    public void weightChanged(ElectronicScale scale, double weightInGrams) {
-       checkIfItemPlaced(weightInGrams);
+//     checkIfItemPlaced(weightInGrams);
        currentWeight = weightInGrams;
    }
 
@@ -79,11 +80,6 @@ public class BaggingArea implements ElectronicScaleObserver{
        return baggingArea;
    }
 
-   // Getter for item, used in testing
-   public Item getItem() {
-       return item;
-   }
-
    // Getter for overloaded, used in testing
    public boolean isOverloaded() {
        return overloaded;
@@ -102,7 +98,7 @@ public class BaggingArea implements ElectronicScaleObserver{
 
    // Get scanned item from scanner
    public void scanBaggingItem(BarcodedItem barcodedItem) {
-       this.item = barcodedItem;
+//       this.item = barcodedItem;
        station.mainScanner.disable();
    }
 
@@ -115,8 +111,8 @@ public class BaggingArea implements ElectronicScaleObserver{
    }
    
    // Check if the weight added on scale equals to the weight of item
-   private void checkIfItemPlaced(double weightInGrams) {
-       if (weightInGrams - currentWeight == item.getWeight()) {
+   private void checkIfItemPlaced(Item anItem) throws OverloadException {
+       if (baggingArea.getCurrentWeight() - currentWeight == anItem.getWeight()) {
            station.mainScanner.enable();
        }
    }
@@ -135,7 +131,7 @@ public class BaggingArea implements ElectronicScaleObserver{
    }
    
    // i am considering an item has to be bagged right after being scanned
-   public void bagItemAfterScanning()
+   public void bagItemAfterScanning() throws OverloadException
    {
 	// copying scannedLists for modification
 	   int lengthList = theScanner.getScanneditems().size();
@@ -151,10 +147,13 @@ public class BaggingArea implements ElectronicScaleObserver{
 	   {
 		   placeItem(itemsToBeBagged.get(0));
 		   // have to check if this item is actually placed else throw exception
+		   checkIfItemPlaced(itemsToBeBagged.get(0));
+		   // checkIfItemPlaced(Item anItem) also enables the scanner ,
+		   // if it causes error remove "station.mainScanner.enable();" line from checkIfItemPlaced
+		   // and add it here
 		   // MORE CODE TO ADD RIGHT HERE
 		   
 		   itemsToBeBagged.remove(0); // removing item after bagging
-		  // enable mainScanner
 		   
 		   // throw exception if item weight < sensitivity or item == null
 		  
