@@ -49,19 +49,19 @@ public class CreditTemp implements CardReaderObserver{
 			paymentSuccessful = true;
 			funds = bank.getAvailableCreditFunds(cardNum).subtract(payment);
 			bank.setAvailableCreditFunds(cardNum, funds);
-			
 		}
 		
-		return paymentSuccessful;
+		reset();
 		
-		
+		return paymentSuccessful;		
 		
 	}
-	//Set the hash table of credit Card Map
-	public void  setCreditCardMap(HashMap<String, BigDecimal> map) {
-		creditCardMap = map;
+	
+	public void reset() {
+		cardNumber = null;
+		cardData = null;
 	}
-
+	
 	@Override
 	public void enabled(AbstractDevice<? extends AbstractDeviceObserver> device) {}
 
