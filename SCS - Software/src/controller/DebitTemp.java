@@ -37,13 +37,13 @@ public class DebitTemp implements CardReaderObserver{
 		BigDecimal funds = null;
 		
 		String cardNum = cardData.getNumber();
-		if(bank.getAvailableCreditFunds(cardNum).compareTo(payment) < 0) {
+		if(bank.getAvailableDebitFunds(cardNum).compareTo(payment) < 0) {
 			paymentSuccessful = false;
 		}
-		if(bank.getAvailableCreditFunds(cardNum).compareTo(payment) >= 0){
+		if(bank.getAvailableDebitFunds(cardNum).compareTo(payment) >= 0){
 			paymentSuccessful = true;
-			funds = bank.getAvailableCreditFunds(cardNum).subtract(payment);
-			bank.setAvailableCreditFunds(cardNum, funds);
+			funds = bank.getAvailableDebitFunds(cardNum).subtract(payment);
+			bank.setAvailableDebitFunds(cardNum, funds);
 		}
 		
 		reset();
