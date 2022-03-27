@@ -62,33 +62,26 @@ public class CardFromCardReader implements CardReaderObserver{
 		
 	}
 	
-
-	//Set the hash table of credit Card Map
-	public void  setLoyaltyPointMap(HashMap<String, Integer> map) {
-		creditCardMap = map;
-	}
 	
 	//Adds more credit to your credit card account
 	public void payWithCredit(String CardNum, BigDecimal payment) {
 		
 	}
 	//Set the hash table of debit Card Map
-	public void  setCreditCardMap(HashMap<String, Integer> map) {
+	public void  setCreditCardMap(HashMap<String, BigDecimal> map) {
 		debitCardMap = map;
 	}
 	
 
 	//MEMBERSHIP CARD METHOD
-
 	public void membershipCard(CardData cardData) {
 		cardNumber = cardData.getNumber();
 		
-	//Set the hash table of loyalty point map
-	public void  setDebitCardMap(HashMap<String, Integer> map) {
-		loyaltyPointMap = map;
-	}
-	
-	//Set customer points
+	public void  setLoyaltyPointMap(HashMap<String, BigDecimal> map) {
+		creditCardMap = map;
+	}	
+		
+	//Set customer points	
 	public void setPoints(String cardNum, int points) {
 		loyaltyPointMap.put(cardNum, points);
 	}
