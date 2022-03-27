@@ -35,11 +35,8 @@ public class CardFromCardReader implements CardReaderObserver{
 		this.station = station;
 		station.cardReader.attach(this);
 	}
-	
-
 
 	//DEBIT CARD METHOD
-	
 	public void debitPay(CardData cardData) {
 		
 	}
