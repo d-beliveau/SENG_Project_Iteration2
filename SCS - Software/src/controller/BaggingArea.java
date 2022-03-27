@@ -65,11 +65,13 @@ public class BaggingArea implements ElectronicScaleObserver{
    @Override
    public void overload(ElectronicScale baggingArea) {
        overloaded = true;
+       station.mainScanner.disable();
    }
 
    @Override
    public void outOfOverload(ElectronicScale baggingArea) {
        overloaded = false;
+       station.mainScanner.enable();
    }
 
    // Getter for scale, used in testing
@@ -127,6 +129,11 @@ public class BaggingArea implements ElectronicScaleObserver{
 	   currentWeight = bagWeight;
    }
    
+   // customer removing bag method
+   public void removeCustomerBag() throws OverloadException{
+	   currentWeight = 0.0;
+   }
+   
    // i am considering an item has to be bagged right after being scanned
    public void bagItemAfterScanning()
    {
@@ -147,6 +154,10 @@ public class BaggingArea implements ElectronicScaleObserver{
 		   // MORE CODE TO ADD RIGHT HERE
 		   
 		   itemsToBeBagged.remove(0); // removing item after bagging
+		  // enable mainScanner
+		   
+		   // throw exception if item weight < sensitivity or item == null
+		  
 	   }
    }
 }
