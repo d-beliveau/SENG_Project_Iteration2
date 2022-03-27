@@ -16,8 +16,6 @@ public class BankStub {
 	private  HashMap<String , Double> creditLimitMap = new HashMap<>();
 	private  HashMap<String , BigDecimal> creditFundsAvailableMap = new HashMap<>();
 
-
-	
 	
 	public BankStub() {}
 	
