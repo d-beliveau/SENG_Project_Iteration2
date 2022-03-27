@@ -15,6 +15,8 @@ public class BankStub {
 	
 	private  HashMap<String , Double> creditLimitMap = new HashMap<>();
 	private  HashMap<String , BigDecimal> creditFundsAvailableMap = new HashMap<>();
+	private  HashMap<String , Double> debitLimitMap = new HashMap<>();
+	private  HashMap<String , BigDecimal> debitFundsAvailableMap = new HashMap<>();
 
 	
 	public BankStub() {}
@@ -23,7 +25,7 @@ public class BankStub {
 		creditLimitMap.put(cardNumber, limit);
 	}
 	
-	public void setAvailableFunds(String cardNumber, BigDecimal funds) {
+	public void setAvailableCreditFunds(String cardNumber, BigDecimal funds) {
 		creditFundsAvailableMap.put(cardNumber, funds);
 	}
 	
@@ -31,8 +33,24 @@ public class BankStub {
 		return creditLimitMap.get(cardNumber);
 	}
 	
-	public BigDecimal getAvailableFunds(String cardNumber) {
+	public BigDecimal getAvailableCreditFunds(String cardNumber) {
 		return creditFundsAvailableMap.get(cardNumber);
+	}
+	
+	public void setDebitLimit(String cardNumber, double limit) {
+		debitLimitMap.put(cardNumber, limit);
+	}
+	
+	public void setAvailableDebitFunds(String cardNumber, BigDecimal funds) {
+		debitFundsAvailableMap.put(cardNumber, funds);
+	}
+	
+	public double getDebitLimit(String cardNumber) {
+		return debitLimitMap.get(cardNumber);
+	}
+	
+	public BigDecimal getAvailableDebitFunds(String cardNumber) {
+		return debitFundsAvailableMap.get(cardNumber);
 	}
 	
 	//to get a randomized amount of funds available
