@@ -46,12 +46,18 @@ public class DebitTemp implements CardReaderObserver{
 			bank.setAvailableCreditFunds(cardNum, funds);
 		}
 		
+		reset();
+		
 		return paymentSuccessful;
 	}
 	
+	public void reset() {
+		cardNumber = null;
+		cardData = null;
+	}
 	
 	//Set the hash table of debit Card Map
-	public void  setDebitDebitMap(HashMap<String, BigDecimal> map) {
+	public void setDebitMap(HashMap<String, BigDecimal> map) {
 		debitCardMap = map;
 	}
 
