@@ -46,8 +46,9 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	private int insertedNoteValue;
 	
 	// Not sure if it's a good idea to set these as class fields. It makes it easier since a method can only return one type.
-	private ArrayList<Integer> billsDue;
-	private ArrayList<BigDecimal> coinsDue;
+	//Change to getters and setters
+	public ArrayList<Integer> billsDue;
+	public ArrayList<BigDecimal> coinsDue;
 	
 	// Constructor, sets 'scs' and 'amountOwed' based off parameters
 	public PayCash(SelfCheckoutStation station, BigDecimal amount){
@@ -91,7 +92,7 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 			deliverChange();
 			enough = true;
 		}
-		else if(paid.compareTo(total) == 0) {
+		else if (paid.compareTo(total) == 0) {
 			
 			scs.coinSlot.disable();
 			scs.banknoteInput.disable();
@@ -128,9 +129,11 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 		
 		// Determines if there is are sufficient banknotes and coins to give as change
 		// Incomplete
+		/*
 		int i = 0;
 		BigDecimal zero = new BigDecimal(0);
 		
+		// To do later
 		try {
 			
 			for(BigDecimal denomination : scs.coinDispensers.keySet()) {
@@ -159,8 +162,9 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	
 		}
 		catch(OverloadException | DisabledException | EmptyException e) {
-			
+			System.out.println("error thrown: " + e);
 		}
+		*/
 		
 		scs.banknoteInput.enable();
 		scs.coinSlot.enable();

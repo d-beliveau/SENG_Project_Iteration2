@@ -40,45 +40,36 @@ import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import controller.PayCash;
 
 public class TestPayCash {
-
+	
+	// Principle fields
 	private PayCash objectUnderTest;
 	private Currency c = Currency.getInstance("CAD");
 	private BigDecimal[] coinDenominations = {new BigDecimal (0.01), new BigDecimal(0.05), new BigDecimal(0.10), new BigDecimal(0.25)};
 	private int[] banknoteDenominations = {1, 5, 10, 20, 50, 100};
 	Random rand = new Random();
 	SelfCheckoutStation scs;
+	
+	// Specific banknotes and coins
 	private Banknote oneBanknote = new Banknote(c, 1);
-	private Banknote[] oneBanknotes = createBanknoteArray(oneBanknote);
 	private Banknote fiveBanknote = new Banknote(c, 5);
-	private Banknote[] fiveBanknotes = createBanknoteArray(fiveBanknote);
 	private Banknote tenBanknote = new Banknote(c, 10);
-	private Banknote[] tenBanknotes = createBanknoteArray(tenBanknote);
 	private Banknote twentyBanknote = new Banknote(c, 20);
-	private Banknote[] twentyBanknotes = createBanknoteArray(twentyBanknote);
 	private Banknote fiftyBanknote = new Banknote(c, 50);
-	private Banknote[] fiftyBanknotes = createBanknoteArray(fiftyBanknote);
 	private Banknote hundredBanknote = new Banknote(c, 100);
-	private Banknote[] hundredBanknotes = createBanknoteArray(hundredBanknote);
-	private Banknote[][] banknotes = {oneBanknotes, fiveBanknotes, tenBanknotes, twentyBanknotes, fiftyBanknotes, hundredBanknotes};
 	private Coin penny = new Coin(c, coinDenominations[0]);
-	private Coin[] pennies = createCoinArray(penny);
 	private Coin nickel = new Coin(c, coinDenominations[1]);
-	private Coin[] nickels = createCoinArray(nickel);
 	private Coin dime = new Coin(c, coinDenominations[2]);
-	private Coin[] dimes = createCoinArray(dime);
 	private Coin quarter = new Coin(c, coinDenominations[3]);
-	private Coin[] quarters = createCoinArray(quarter);
-	private Coin[][] coins = {pennies, nickels, dimes, quarters};
 	
 	
-	// Setup a Self Checkout Station and PayCash object to run tests with and on
+	// Setup a PayCash object "objectUnderTest" to run tests on
 	@Before
 	public void setup() {
 		BigDecimal b = new BigDecimal(50);
 		scs = new SelfCheckoutStation(c, banknoteDenominations, coinDenominations, 10000, 1);
-		objectUnderTest = new PayCash(scs, b);
-		
+		objectUnderTest = new PayCash(scs, b);	
 	}
+	
 	
 	@Test (timeout = 500)
 	public void testCheckEnough() {
@@ -87,6 +78,50 @@ public class TestPayCash {
 		assertTrue(objectUnderTest.checkEnough(two, one));
 		assertTrue(objectUnderTest.checkEnough(one, one));
 		assertFalse(objectUnderTest.checkEnough(one, two));
+	}
+	
+	
+	@Test (timeout = 500)
+	public void testDetermineChagne() {
+		BigDecimal paid = new BigDecimal(40.00);
+		BigDecimal cost = new BigDecimal(21.59);
+		objectUnderTest.determineChange(paid, cost);
+		int[] expectedBills = {1, 1, 1, 5, 10};
+		double[] expectedCoins = {0.01, 0.05, 0.10, 0.25};
+		
+		Boolean b = true;
+		for (int i = 0; i < objectUnderTest.billsDue.size() ; i++) {
+			if (objectUnderTest.billsDue.get(i) != expectedBills[i]) {
+				b = false;
+				break;
+			}
+		}
+		
+		Boolean c = true;
+		for (int i = 0; i < objectUnderTest.coinsDue.size() ; i++) {
+			if (objectUnderTest.coinsDue.get(i).doubleValue() != expectedCoins[i]) {;
+				c = false;
+				break;
+			}
+		}
+		
+		assertTrue(b);
+		assertTrue(c);
+		
+	}
+	
+	
+	@Test (timeout = 500)
+	public void testSeparateCoinsFromBills() {
+		BigDecimal change = new BigDecimal(18.41);
+		ArrayList<BigDecimal> result = objectUnderTest.separateCoinsFromBills(change);
+		
+		Boolean a = false;
+		if ((result.get(0).intValue() == 18) & (result.get(1).setScale(2, RoundingMode.HALF_EVEN).doubleValue() == 0.41)) {
+			a = true;
+		}
+		
+		assertTrue(a);
 	}
 	
 	
@@ -137,13 +172,6 @@ public class TestPayCash {
 		assertTrue(v);
 	}
 	
-	
-	@Test (timeout = 500)
-	public void testDetermineChange() {
-		BigDecimal paid = new BigDecimal(25.00);
-		BigDecimal cost = new BigDecimal(17.89);
-		
-	}
 	
 	@Test
 	public void testValidBanknoteInserted() throws DisabledException{
@@ -243,6 +271,9 @@ public class TestPayCash {
 		
 		return array;
 	}
+	
+}
+
 
 //*** KEEP THESE METHODS FOR LATER IMPLENTATIONS***//
 //*** PLEASE DON'T DELETE YET ***//
@@ -343,4 +374,28 @@ public class TestPayCash {
 //		scs.banknoteDispensers.get(5).load(createGiantNoteArray(fiveBanknote));
 //		scs.banknoteValidator.accept(fiveBanknote);
 //	}
-}
+/*	
+	private Banknote oneBanknote = new Banknote(c, 1);
+	//private Banknote[] oneBanknotes = createBanknoteArray(oneBanknote);
+	private Banknote fiveBanknote = new Banknote(c, 5);
+	//private Banknote[] fiveBanknotes = createBanknoteArray(fiveBanknote);
+	private Banknote tenBanknote = new Banknote(c, 10);
+	//private Banknote[] tenBanknotes = createBanknoteArray(tenBanknote);
+	private Banknote twentyBanknote = new Banknote(c, 20);
+	//private Banknote[] twentyBanknotes = createBanknoteArray(twentyBanknote);
+	private Banknote fiftyBanknote = new Banknote(c, 50);
+	//private Banknote[] fiftyBanknotes = createBanknoteArray(fiftyBanknote);
+	private Banknote hundredBanknote = new Banknote(c, 100);
+	//private Banknote[] hundredBanknotes = createBanknoteArray(hundredBanknote);
+	//private Banknote[][] banknotes = {oneBanknotes, fiveBanknotes, tenBanknotes, twentyBanknotes, fiftyBanknotes, hundredBanknotes};
+	private Coin penny = new Coin(c, coinDenominations[0]);
+	//private Coin[] pennies = createCoinArray(penny);
+	private Coin nickel = new Coin(c, coinDenominations[1]);
+	//private Coin[] nickels = createCoinArray(nickel);
+	private Coin dime = new Coin(c, coinDenominations[2]);
+	//private Coin[] dimes = createCoinArray(dime);
+	private Coin quarter = new Coin(c, coinDenominations[3]);
+	//private Coin[] quarters = createCoinArray(quarter);
+	//private Coin[][] coins = {pennies, nickels, dimes, quarters};
+	 * 
+	 */
