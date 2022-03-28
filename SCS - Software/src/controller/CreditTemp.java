@@ -19,20 +19,27 @@ public class CreditTemp implements CardReaderObserver{
 	private String cardType;
 	private boolean needPin = false;
 	
-	private BigDecimal amountOwed;
-	private BigDecimal amountPaid;
+	private boolean dataRead = false;
+	
+	private BigDecimal paymentAmount;
+	
 	
 	private BankStub bank = new BankStub();
 	
-	public CreditTemp(SelfCheckoutStation station) {
+	public CreditTemp(SelfCheckoutStation station, BigDecimal payment) {
 		this.station = station;
 		station.cardReader.attach(this);
+		
+		paymentAmount = payment;
 	}
 	
 	
 	
 	public void creditPay(CardData data) {
 		cardData = data;
+		cardType = data.getType();
+		cardNumber = data.getNumber();
+		payWithCredit(cardData, paymentAmount);
 		
 	}
 	
@@ -62,6 +69,7 @@ public class CreditTemp implements CardReaderObserver{
 		cardData = null;
 	}
 	
+
 	@Override
 	public void enabled(AbstractDevice<? extends AbstractDeviceObserver> device) {}
 
@@ -70,6 +78,7 @@ public class CreditTemp implements CardReaderObserver{
 	
 	@Override
 	public void cardInserted(CardReader reader) {
+		dataRead = false;
 		needPin = true;
 	}
 
@@ -78,19 +87,19 @@ public class CreditTemp implements CardReaderObserver{
 
 	@Override
 	public void cardTapped(CardReader reader) {
+		dataRead = false;
 		
 	}
 
 	@Override
-	public void cardSwiped(CardReader reader) {}
-
+	public void cardSwiped(CardReader reader) { 
+		dataRead = false;
+	}
+		
 
 	@Override
 	public void cardDataRead(CardReader reader, CardData data) {
-		cardData = data;
-		cardType = data.getType();
-		cardNumber = data.getNumber();
-		
+		dataRead = true;
 		creditPay(data);
 	}
 }
