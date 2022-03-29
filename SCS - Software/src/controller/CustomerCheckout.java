@@ -21,6 +21,8 @@
 
 package controller;
 
+import java.math.BigDecimal;
+
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 
 /**
@@ -29,17 +31,90 @@ import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
  */
 
 // Control software for 'customer wishes to checkout' use case 
+
 public class CustomerCheckout{
+	
+	private SelfCheckoutStation station;
+	private CardFromCardReader cardLogic;
+	private PayCash cashLogic;
+	private BigDecimal amountOwed;
+	
 	public CustomerCheckout(SelfCheckoutStation station) {
-		station.scanner.disable();
-		station.scale.disable();
-		station.coinSlot.enable();
-		station.coinValidator.enable();
-		station.coinStorage.enable();
-		station.coinTray.enable();
-		station.banknoteInput.enable();
-		station.banknoteValidator.enable();
-		station.banknoteStorage.enable();
-		station.banknoteOutput.enable();
+		this.station = station;
 	}
+	
+	
+	//Checkout station state before customer starts using the station
+	public void beforeStartPurchase() {
+		station.mainScanner.disable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+		station.cardReader.disable();
+	}
+	
+	//Checkout station state after customer press start purchase button
+	public void startPurchase() {
+		station.mainScanner.enable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+		station.cardReader.disable();
+	}
+	
+	//Customer choose to pay with bank note and coin
+	public void payWithBankNoteAndCoin(BigDecimal payment) {
+		cashLogic.setAmountOwed(payment);
+		
+		station.mainScanner.disable();
+		station.cardReader.disable();
+		
+		station.coinSlot.enable();
+		station.banknoteInput.enable();
+	}
+	
+	//Customer chooses to use membership card
+	public void useMembershipCard() {
+		station.cardReader.enable();
+	}
+
+	//Customer choose to use debit or credit card for payment
+	public void payWithDebitOrCredit(BigDecimal payment) {
+		cardLogic.paymentAmount = payment;
+		station.cardReader.enable();
+		
+		station.mainScanner.disable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+	}
+	
+	
+	//Customer choose this as final option they are done with all payment
+	public boolean confirmPurchase() {
+		 int res;
+		 BigDecimal amountPayed = cashLogic.getTotalPayment().add(cardLogic.paymentTotal);
+	     res = amountOwed.compareTo(amountPayed);
+
+	     //Return false if customer has not paid for everything
+	     if( res == 1 ) {
+	         return false;
+	     }
+		
+		station.mainScanner.disable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+		station.cardReader.disable();
+		
+		//Returns true if everything is paid for
+		return true;
+		
+	}
+	
+	//Customer wishes to add more items even after partial payment
+	public void addItemToScanner() {
+		station.mainScanner.enable();
+		
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+		station.cardReader.disable();
+	}
+	
 }
