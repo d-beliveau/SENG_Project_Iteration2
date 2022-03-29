@@ -22,10 +22,11 @@ public class CardFromCardReader implements CardReaderObserver{
 	private CardData cardData;
 	private String cardNumber;
 	private String cardType;
-	
+	private boolean success = false;
 	private BankStub bank = new BankStub();
 	
 	protected BigDecimal paymentAmount;
+	protected BigDecimal paymentTotal;
 	protected String memberNumber;
 	
 	public CardFromCardReader(SelfCheckoutStation station) {
@@ -48,8 +49,6 @@ public class CardFromCardReader implements CardReaderObserver{
 			bank.setAvailableDebitFunds(cardNum, funds);
 		}
 		
-		reset();
-		
 		return paymentSuccessful;
 	}
 	
@@ -69,8 +68,6 @@ public class CardFromCardReader implements CardReaderObserver{
 			bank.setAvailableCreditFunds(cardNum, funds);
 		}
 		
-		reset();
-		
 		return paymentSuccessful;		
 		
 	}
@@ -78,6 +75,7 @@ public class CardFromCardReader implements CardReaderObserver{
 	public void reset() {
 		cardNumber = null;
 		cardData = null;
+		success = false;
 	}
 	
 
@@ -97,17 +95,22 @@ public class CardFromCardReader implements CardReaderObserver{
 		cardType = data.getType();
 		switch(cardType) {
 		case "Debit":
-			payWithDebit(cardData);
+			success = payWithDebit(cardData);
 			break;
 			
 		case "Credit":
-			payWithCredit(cardData);
+			success = payWithCredit(cardData);
 			break;
 			
 		case "Member":
 			membershipCard(cardData);
 			break;
 		}
+		
+		if (success == true) {
+			paymentTotal.add(paymentAmount);
+		}
+		reset();
 	}
 	
 	/*
