@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Currency;
-import java.util.Random;
 import org.junit.*;
 import org.lsmr.selfcheckout.Banknote;
 import org.lsmr.selfcheckout.Coin;
@@ -46,7 +45,6 @@ public class TestPayCash {
 	private Currency c = Currency.getInstance("CAD");
 	private BigDecimal[] coinDenominations = {new BigDecimal (0.01), new BigDecimal(0.05), new BigDecimal(0.10), new BigDecimal(0.25)};
 	private int[] banknoteDenominations = {1, 5, 10, 20, 50, 100};
-	Random rand = new Random();
 	SelfCheckoutStation scs;
 	
 	// Specific banknotes and coins
@@ -155,7 +153,7 @@ public class TestPayCash {
 	@Test (timeout = 500)
 	public void testCalcBillsChange() {
 		// Add RNG for var
-		int var = rand.nextInt(501);
+		int var = 169;
 		BigDecimal dollars = new BigDecimal(var);
 		ArrayList<Integer> result = objectUnderTest.calcBillsChange(dollars);
 		

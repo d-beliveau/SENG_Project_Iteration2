@@ -77,11 +77,34 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	}
 	
 
+	// Checkout controller
+	public void checkoutController() {
+		
+		scs.banknoteInput.enable();
+		
+		BigDecimal paid = promptCash();
+		while (!checkEnough(paid, amountOwed)) {
+			paid = promptCash();
+		}
+		
+		System.out.println("Checkout complete");
+	}
+	
+	// Prompt for cash
+	// Returns cash entered
+	public BigDecimal promptCash() {
+		System.out.println("Please enter $" + amountOwed);
+		// Set up slot
+		BigDecimal cashPaid;
+		return null; //cashPaid;
+	}
+	
 	// Compares totalPayment (money entered) to amountOwed (cost of goods)
 	public Boolean checkEnough(BigDecimal paid, BigDecimal total) {
 		
 		Boolean enough;
 		
+		// Paid more than cost
 		if(paid.compareTo(total) == 1) {
 			
 			scs.coinSlot.disable();
@@ -92,12 +115,14 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 			deliverChange();
 			enough = true;
 		}
+		// Exact change
 		else if (paid.compareTo(total) == 0) {
 			
 			scs.coinSlot.disable();
 			scs.banknoteInput.disable();
 			enough = true;
 		}
+		// Insufficient funds
 		else {
 			
 			enough = false;
