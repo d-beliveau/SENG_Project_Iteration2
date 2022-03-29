@@ -128,9 +128,47 @@ public class TestBaggingArea {
 			area.scanBaggingItem(item2);
 			area.placeItem(item2);
 			assertTrue(area.isOverloaded());
+		} catch(SimulationException e) {
+			fail("there should not have been an exception");
+		}
+	}
+	
+	
+	
+//	Added extra test cases, please verify before merging
+	@Test
+	public void testOutOfOverload() {
+		Numeral[] nums1 = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode1 = new Barcode(nums1);
+		BarcodedItem item1 = new BarcodedItem(barcode1, 499.0);
+
+		Numeral[] nums2 = {Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 4), Numeral.valueOf((byte) 6), Numeral.valueOf((byte) 8)};
+		Barcode barcode2 = new Barcode(nums2);
+		BarcodedItem item2 = new BarcodedItem(barcode2, 2.0);
+		try {
+			area.scanBaggingItem(item1);
+			area.placeItem(item1);
+			area.scanBaggingItem(item2);
+			area.placeItem(item2);
+			assertTrue(area.isOverloaded());
 			area.getScale().remove(item2);
 			assertFalse(area.isOverloaded());
 		} catch(SimulationException e) {
+			fail("there should not have been an exception");
+		}
+	}
+	
+	@Test
+	public void testRemoveItem() {
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		try {
+			area.scanBaggingItem(item);
+			area.placeItem(item);
+			area.getScale().remove(item);
+			assertEquals(area.getScale().getCurrentWeight(), 0.0, 0.01);
+		} catch(Exception e) {
 			fail("there should not have been an exception");
 		}
 	}
