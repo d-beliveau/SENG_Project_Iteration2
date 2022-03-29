@@ -20,16 +20,14 @@ public class CardFromCardReader implements CardReaderObserver{
 
 	
 	private SelfCheckoutStation station;
-	
-	//Map card number to loyalty point
-	private  HashMap<String, Integer> loyaltyPointMap = new HashMap<>();
-	private  HashMap<String , BigDecimal> creditCardMap = new HashMap<>();
-	private  HashMap<String , BigDecimal> debitCardMap = new HashMap<>();
-	
 	private CardData cardData;
-	protected String cardNumber;
+	private String cardNumber;
 	private String cardType;
-	private boolean needPin = false;
+	
+	private BankStub bank = new BankStub();
+	
+	protected BigDecimal paymentAmount;
+	protected String memberNumber;
 	
 	public CardFromCardReader(SelfCheckoutStation station) {
 		this.station = station;
@@ -37,88 +35,61 @@ public class CardFromCardReader implements CardReaderObserver{
 	}
 
 	//DEBIT CARD METHOD
-	public void debitPay(CardData cardData) {
+	public boolean payWithDebit(CardData cardData) {
+		boolean paymentSuccessful = false;
+		BigDecimal funds = null;
 		
+		String cardNum = cardData.getNumber();
+		if(bank.getAvailableDebitFunds(cardNum).compareTo(paymentAmount) < 0) {
+			paymentSuccessful = false;
+		}
+		if(bank.getAvailableDebitFunds(cardNum).compareTo(paymentAmount) >= 0){
+			paymentSuccessful = true;
+			funds = bank.getAvailableDebitFunds(cardNum).subtract(paymentAmount);
+			bank.setAvailableDebitFunds(cardNum, funds);
+		}
+		
+		reset();
+		
+		return paymentSuccessful;
 	}
-	
-	//Set the hash table of debit card map
-	public void  setDebitCardMap(HashMap<String, BigDecimal> map) {
-		debitCardMap = map;
-	}
-	
-	
-	//Removes money from your debit account 
-	public void payWithDebit(String CardNum, BigDecimal payment) {
-	
-	}
-	
 	
 	//CREDIT CARD METHOD
 	
-	public void creditPay(CardData cardData) {
+	//Takes card data and customer's desired payment amount with this payment method
+	public boolean payWithCredit(CardData cardData) {
+		boolean paymentSuccessful = false;
+		BigDecimal funds = null;
+		
+		String cardNum = cardData.getNumber();
+		if(bank.getAvailableCreditFunds(cardNum).compareTo(paymentAmount) < 0) {
+			paymentSuccessful = false;
+		}
+		if(bank.getAvailableCreditFunds(cardNum).compareTo(paymentAmount) >= 0){
+			paymentSuccessful = true;
+			funds = bank.getAvailableCreditFunds(cardNum).subtract(paymentAmount);
+			bank.setAvailableCreditFunds(cardNum, funds);
+		}
+		
+		reset();
+		
+		return paymentSuccessful;		
 		
 	}
 	
-	
-	//Adds more credit to your credit card account
-	public void payWithCredit(String CardNum, BigDecimal payment) {
-		
-	}
-	//Set the hash table of debit Card Map
-	public void  setCreditCardMap(HashMap<String, BigDecimal> map) {
-		debitCardMap = map;
+	public void reset() {
+		cardNumber = null;
+		cardData = null;
 	}
 	
 
 	//MEMBERSHIP CARD METHOD
 	public void membershipCard(CardData cardData) {
-		cardNumber = cardData.getNumber();
-		
-	public void  setLoyaltyPointMap(HashMap<String, BigDecimal> map) {
-		creditCardMap = map;
-	}	
-		
-	//Set customer points	
-	public void setPoints(String cardNum, int points) {
-		loyaltyPointMap.put(cardNum, points);
+		memberNumber = cardData.getNumber();
 	}
 	
-	//Get the customer points
-	public int getPoints() {
-		return loyaltyPointMap.get(cardNumber);
-	}
-	
-	//Return the cash discount you get
-	public int cashDiscount(int points) {
-		int userPoint = loyaltyPointMap.get(cardNumber);
-		int discount = userPoint/100;
-		int newLoyaltyPoint = userPoint - (discount * 100);
-		loyaltyPointMap.put(cardNumber, newLoyaltyPoint);
-		return discount;
-	}
-	
-	public void gainLoyaltyPoints(BigDecimal price) {
-		int addedPoint = (price.intValue()/10) * 100;
-		int newLoyaltyPoint = loyaltyPointMap.get(cardNumber) + addedPoint;
-		loyaltyPointMap.put(cardNumber, newLoyaltyPoint);
-	}
-	
-	
-	@Override
-	public void enabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// Ignore
-		
-	}
-
-	@Override
-	public void disabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// Ignore
-		
-	}
-
-	@Override
-	public void cardInserted(CardReader reader) {
-		needPin = true;
+	public String getMemberNum() {
+		return memberNumber;
 	}
 	
 	
@@ -128,11 +99,11 @@ public class CardFromCardReader implements CardReaderObserver{
 		cardType = data.getType();
 		switch(cardType) {
 		case "Debit":
-			debitPay(cardData);
+			payWithDebit(cardData);
 			break;
 			
 		case "Credit":
-			creditPay(cardData);
+			payWithCredit(cardData);
 			break;
 			
 		case "Member":
@@ -158,6 +129,9 @@ public class CardFromCardReader implements CardReaderObserver{
 
 	@Override
 	public void cardTapped(CardReader reader) {}
+	
+	@Override
+	public void cardInserted(CardReader reader) {}
 
 	@Override
 	public void cardSwiped(CardReader reader) {}
