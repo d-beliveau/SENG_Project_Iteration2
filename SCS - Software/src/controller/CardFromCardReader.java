@@ -54,7 +54,6 @@ public class CardFromCardReader implements CardReaderObserver{
 	}
 	
 	//CREDIT CARD METHOD
-	
 	//Takes card data and customer's desired payment amount with this payment method
 	public boolean payWithCredit(CardData cardData) {
 		boolean paymentSuccessful = false;
@@ -110,8 +109,6 @@ public class CardFromCardReader implements CardReaderObserver{
 			break;
 		}
 	}
-	
-
 	
 	/*
 	 * Unused implementations
