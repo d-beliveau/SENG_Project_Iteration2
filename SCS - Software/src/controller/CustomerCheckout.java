@@ -31,7 +31,7 @@ import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
  */
 
 // Control software for 'customer wishes to checkout' use case 
-// use case for partial payment as well
+
 public class CustomerCheckout{
 	
 	private SelfCheckoutStation station;
@@ -42,7 +42,7 @@ public class CustomerCheckout{
 	
 	
 	//Checkout station state before customer starts using the station
-	public void beforePurchase() {
+	public void beforeStartPurchase() {
 		station.mainScanner.disable();
 		station.coinSlot.disable();
 		station.banknoteInput.disable();
@@ -52,7 +52,6 @@ public class CustomerCheckout{
 	//Checkout station state after customer press start purchase button
 	public void startPurchase() {
 		station.mainScanner.enable();
-		
 		station.coinSlot.disable();
 		station.banknoteInput.disable();
 		station.cardReader.disable();
@@ -88,7 +87,7 @@ public class CustomerCheckout{
 	     res = amountOwed.compareTo(new BigDecimal(0));
 
 	     //Return false if customer has not paid for everything
-	     if( res == 0 || res == -1 ) {
+	     if( res == 1 ) {
 	         return false;
 	     }
 		
@@ -103,7 +102,7 @@ public class CustomerCheckout{
 	}
 	
 	//Customer wishes to add more items even after partial payment
-	public void addMoreItems() {
+	public void addItemToScanner() {
 		station.mainScanner.enable();
 		
 		station.coinSlot.disable();

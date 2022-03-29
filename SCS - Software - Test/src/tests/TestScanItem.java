@@ -21,13 +21,17 @@
 
 package tests;
 
+import org.lsmr.selfcheckout.Banknote;
 import org.lsmr.selfcheckout.Barcode;
 import org.lsmr.selfcheckout.BarcodedItem;
 import org.lsmr.selfcheckout.Numeral;
+import org.lsmr.selfcheckout.devices.DisabledException;
+import org.lsmr.selfcheckout.devices.OverloadException;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.SimulationException;
 import org.lsmr.selfcheckout.products.BarcodedProduct;
 
+import controller.PayCash;
 import controller.ScanItem;
 
 import java.math.BigDecimal;
@@ -84,8 +88,8 @@ public class TestScanItem {
         this.doritoItem = new BarcodedItem(doritoBar, 50);
 
         //Set-up products
-        this.soupProd = new BarcodedProduct(soupBar,"Soup",soupPrice);
-        this.doritoProd = new BarcodedProduct(doritoBar,"Soup",doritoPrice);
+        this.soupProd = new BarcodedProduct(soupBar,"Soup",soupPrice, 0);
+        this.doritoProd = new BarcodedProduct(doritoBar,"Soup",doritoPrice, 0);
     }
 
     //BASIC FUNCTIONALITY TESTING
@@ -253,7 +257,7 @@ public class TestScanItem {
     	while(this.software.scanResult() == false);
     	
     	//Compare price of single dorito item
-    	assertEquals(doritoPrice,this.software.GetBillPrice());
+    	assertEquals(doritoPrice,this.software.GetBillPrice(new BigDecimal(0)));
     }
     
     //Test to tally cost of multiple products
@@ -280,20 +284,63 @@ public class TestScanItem {
     	while(this.software.scanResult() == false);
     	
     	//Compare bill price
-    	assertEquals(Price,this.software.GetBillPrice());
+    	assertEquals(Price,this.software.GetBillPrice(new BigDecimal(0)));
     }
 
     //Test observer is disabled
     @Test
     public void testDisable()
     {
-    	this.software.disabled(station.scanner);
+    	this.software.disabled(station.mainScanner);
     }
     
     //Test observer is enabled
     @Test
     public void testEnable()
     {
-    	this.software.enabled(station.scanner);
+    	this.software.enabled(station.mainScanner);
     }
+    
+    //Test for scanning more item after partial payment
+    @Test
+    public void testPartialPayment() throws DisabledException, OverloadException {
+    	//Add soup item
+    	do 
+    	{
+    		Status = this.software.scanAnItem(soupItem);
+    	}
+    	while(this.Status == false);
+    	
+    	//The soup cost $50
+    	PayCash payCash = new PayCash(station, software.GetBillPrice(new BigDecimal(0)));
+    	
+    	//Lets make a partial payment of $20. We still have $30 payment left
+    	Banknote partialPayment = new Banknote( Currency.getInstance("CAD") , 20);
+    	station.banknoteInput.accept(partialPayment);
+    	
+    	
+    	//Add dorito item. The dorito item cost $50
+    	//Now we have to make a payment of $80
+    	do 
+    	{
+    		Status = this.software.scanAnItem(doritoItem);
+    	}
+    	while(this.Status == false);
+    	
+    	
+    	//The scanner controller will recalculate how much you have not pay now 
+    	//And send that value to the payCash controller
+    	payCash.setTotalPayment(software.GetBillPrice( new BigDecimal(20)));
+    	
+    	
+    	//Lets make the full payment of all item with a $100 bill
+    	Banknote fullPayment = new Banknote( Currency.getInstance("CAD") , 100);
+    	software.getBillPrice
+  
+    	station.banknoteInput.accept(fullPayment);
+    	
+    	assertEqual();
+    	
+    }
+    
 }
