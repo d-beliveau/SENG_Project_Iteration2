@@ -58,6 +58,7 @@ public class TestPaymentCards {
 	 /*
 	  * Tests to see if the payment will fail if a payment method fails
 	  */
+
 	 @Test
 	 public void payMixFail() throws IOException, DisabledException, OverloadException {
 		 bank.setAvailableDebitFunds("87654321", new BigDecimal(10));
