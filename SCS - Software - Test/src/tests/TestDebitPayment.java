@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 
 import controller.CardFromCardReader;
@@ -26,6 +27,11 @@ public class TestDebitPayment {
 		station.cardReader.enable();
 	}
 	
-	
+	 @Test
+	 public void debitFundsAvailable() {
+		 cardRead = new CardFromCardReader(station);
+		 
+		 station.cardReader.attach(cardRead);
+	 }
 
 }
