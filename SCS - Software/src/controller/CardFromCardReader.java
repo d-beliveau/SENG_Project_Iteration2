@@ -17,7 +17,6 @@ import org.lsmr.selfcheckout.products.BarcodedProduct;
 import org.lsmr.selfcheckout.Card;
 
 public class CardFromCardReader implements CardReaderObserver{
-
 	
 	private SelfCheckoutStation station;
 	private CardData cardData;
