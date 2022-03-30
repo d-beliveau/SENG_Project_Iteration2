@@ -34,17 +34,21 @@ import org.lsmr.selfcheckout.devices.observers.BanknoteValidatorObserver;
 import org.lsmr.selfcheckout.devices.observers.CoinStorageUnitObserver;
 import org.lsmr.selfcheckout.devices.observers.CoinValidatorObserver;
 
-//Control software for 'customer pays with coin' and 'customer pays with banknote' use cases
+// Control software for 'customer pays with coin,' 'customer pays with banknote,' and 'give customer change' use cases
 public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver, /*CoinDispenserObserver, BanknoteDispenserObserver,
 	*/CoinStorageUnitObserver, BanknoteStorageUnitObserver{
 	
-	// Changing PayCash fields to a single SelfCheckoutStation feild
+	// PayCash principle fields
 	private SelfCheckoutStation scs;
-
 	private BigDecimal totalPayment = new BigDecimal(0);
 	private BigDecimal amountOwed;
 	private BigDecimal insertedCoinValue;
 	private int insertedNoteValue;
+	
+	// Not sure if it's a good idea to set these as class fields. It makes it easier since a method can only return one type.
+	//Change to getters and setters
+	public ArrayList<Integer> billsDue;
+	public ArrayList<BigDecimal> coinsDue;
 	
 	// Constructor, sets 'scs' and 'amountOwed' based off parameters
 	public PayCash(SelfCheckoutStation station, BigDecimal amount){
@@ -73,24 +77,52 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	}
 	
 
+	// Checkout controller
+	public void checkoutController() {
+		
+		scs.banknoteInput.enable();
+		
+		BigDecimal paid = promptCash();
+		while (!checkEnough(paid, amountOwed)) {
+			paid = promptCash();
+		}
+		
+		System.out.println("Checkout complete");
+	}
+	
+	// Prompt for cash
+	// Returns cash entered
+	public BigDecimal promptCash() {
+		System.out.println("Please enter $" + amountOwed);
+		// Set up slot
+		BigDecimal cashPaid;
+		return null; //cashPaid;
+	}
+	
 	// Compares totalPayment (money entered) to amountOwed (cost of goods)
 	public Boolean checkEnough(BigDecimal paid, BigDecimal total) {
 		
 		Boolean enough;
 		
+		// Paid more than cost
 		if(paid.compareTo(total) == 1) {
 			
 			scs.coinSlot.disable();
 			scs.banknoteInput.disable();
-//			deliverChange(total, paid);
+			
+			// Initiate change calculation and delivery
+			determineChange(paid, total);
+			deliverChange();
 			enough = true;
 		}
-		else if(paid.compareTo(total) == 0) {
+		// Exact change
+		else if (paid.compareTo(total) == 0) {
 			
 			scs.coinSlot.disable();
 			scs.banknoteInput.disable();
 			enough = true;
 		}
+		// Insufficient funds
 		else {
 			
 			enough = false;
@@ -99,6 +131,88 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 		return enough;
 	}	
 	
+	
+	// Delivers change to customer
+	// void return type is tentative
+	public void deliverChange() {
+		// Call banknote dispenser
+		// Call coin dispenser
+	}
+	
+	
+	// Principle method for determining change, calls other methods for calculation
+	// void return type is tentative
+	public void determineChange(BigDecimal paid, BigDecimal total) {
+		
+		// Using other methods to calculate change due in array lists of integers (banknotes) and BigDecimal (coins)
+		BigDecimal changeDue = paid.subtract(total);
+		ArrayList<BigDecimal> changeList = separateCoinsFromBills(changeDue);
+		ArrayList<Integer> billsDue = calcBillsChange(changeList.get(0));
+		Collections.sort(billsDue);
+		ArrayList<BigDecimal> coinsDue = calcCoinsChange(changeList.get(1));
+		Collections.sort(coinsDue);
+		
+		// Determines if there is are sufficient banknotes and coins to give as change
+		// Incomplete
+		/*
+		int i = 0;
+		BigDecimal zero = new BigDecimal(0);
+		
+		// To do later
+		try {
+			
+			for(BigDecimal denomination : scs.coinDispensers.keySet()) {
+				
+				while(coinsDue.contains(denomination)) {
+					
+					scs.coinDispensers.get(denomination).emit();
+					coinsDue.set(i, zero);
+					i++;
+					changeDue = changeDue.subtract(denomination);
+				}
+			}
+			
+			for(int denomination : scs.banknoteDispensers.keySet()) {
+				
+				while(billsDue.contains(denomination)) {
+					
+					scs.banknoteDispensers.get(denomination).emit();
+					billsDue.set(i, 0);
+					i++;
+					changeDue =  changeDue.subtract(BigDecimal.valueOf(denomination));
+				}
+			}
+		
+			i = 0;
+	
+		}
+		catch(OverloadException | DisabledException | EmptyException e) {
+			System.out.println("error thrown: " + e);
+		}
+		*/
+		
+		scs.banknoteInput.enable();
+		scs.coinSlot.enable();
+		
+		// Setting class fields
+		this.billsDue = billsDue;
+		this.coinsDue = coinsDue;
+	}
+	
+	
+	// Separates change due in coins from change due in banknotes
+	public ArrayList<BigDecimal> separateCoinsFromBills(BigDecimal change) {
+	
+		double changeDouble = change.doubleValue();
+		int changeInt = change.intValue();
+		changeDouble -= changeInt;
+		
+		ArrayList<BigDecimal> changeReturn = new ArrayList<>();
+		changeReturn.add(new BigDecimal(changeInt));
+		changeReturn.add(new BigDecimal(changeDouble));
+		
+		return changeReturn;
+	}
 	
 	// Calculates change due in banknotes by looping through a banknotes assignment
 	public ArrayList<Integer> calcBillsChange(BigDecimal change) {
@@ -164,6 +278,7 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 
 		return coinsDue;
 	}
+	
 	
 	@Override
 	public void validCoinDetected(CoinValidator validator, BigDecimal value) {
