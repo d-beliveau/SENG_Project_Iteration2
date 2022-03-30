@@ -41,8 +41,8 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	// PayCash principle fields
 	private SelfCheckoutStation scs;
 	private BigDecimal totalPayment = new BigDecimal(0);
-	private BigDecimal amountOwed;
-	private BigDecimal insertedCoinValue;
+	private BigDecimal amountOwed = new BigDecimal(0);
+	private BigDecimal insertedCoinValue = new BigDecimal(0);
 	private int insertedNoteValue;
 	
 	// Not sure if it's a good idea to set these as class fields. It makes it easier since a method can only return one type.
