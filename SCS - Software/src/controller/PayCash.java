@@ -42,8 +42,8 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	private SelfCheckoutStation scs;
 
 	private BigDecimal totalPayment = new BigDecimal(0);
-	private BigDecimal amountOwed;
-	private BigDecimal insertedCoinValue;
+	private BigDecimal amountOwed = new BigDecimal(0);
+	private BigDecimal insertedCoinValue = new BigDecimal(0);
 	private int insertedNoteValue;
 	
 	// Constructor, sets 'scs' and 'amountOwed' based off parameters
