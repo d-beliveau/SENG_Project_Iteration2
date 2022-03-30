@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.lsmr.selfcheckout.Card;
 import org.lsmr.selfcheckout.ChipFailureException;
 import org.lsmr.selfcheckout.MagneticStripeFailureException;
+import org.lsmr.selfcheckout.TapFailureException;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 
 import controller.BankStub;
@@ -68,7 +69,7 @@ public class TestCreditPayment {
 				readSuccessful = true;
 			} catch (IOException e) {
 				
-				if(e instanceof ChipFailureException) {
+				if(e instanceof TapFailureException) {
 					continue;
 				}
 				else { 
@@ -96,7 +97,7 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
-				if(e instanceof ChipFailureException) {
+				if(e instanceof TapFailureException) {
 					continue;
 				}
 				else {
@@ -174,7 +175,7 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
-				if(e instanceof ChipFailureException) {
+				if(e instanceof TapFailureException) {
 					continue;
 				}
 				else {
@@ -201,7 +202,7 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
-				if(e instanceof ChipFailureException) {
+				if(e instanceof TapFailureException) {
 					continue;
 				}
 				else {
@@ -227,7 +228,7 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
-				if(e instanceof ChipFailureException) {
+				if(e instanceof TapFailureException) {
 					continue;
 				}
 				else {
