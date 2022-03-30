@@ -179,7 +179,7 @@ public class TestBaggingArea {
 	}
 	
 	@Test
-	public void testItemAddedAfterScanning() throws InterruptedException
+	public void testItemAddedAfterScanning() throws InterruptedException, OverloadException
 	{
 		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
 		Barcode barcode = new Barcode(nums);
@@ -187,11 +187,39 @@ public class TestBaggingArea {
 		ScanItem scanItem = new ScanItem(station);
 		station.mainScanner.enable();
 		scanItem.scanAnItem(item);
-		station.mainScanner.scan(item);
+//		station.mainScanner.scan(item);
 		Thread.sleep(2000);
 		assertTrue(scanItem.getHasItemBeenBagged());
+	//	assertEquals(area.getScale().getCurrentWeight(), 0.0, 0.1); 
 	}
 	
-	@
+	@Test (expected = SimulationException.class)
+	public void testNotScanningBeforeBagging() throws OverloadException
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		// this item has not been scanned 
+
+		station.mainScanner.enable();
+		area.bagItemAfterScanning();
+	//	assertTrue(scanItem.getHasItemBeenBagged());
+
+	}
+	
+	@Test 
+	public void testItemTooLight() throws OverloadException
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 0.00005);
+		ScanItem scanItem = new ScanItem(station);
+		station.mainScanner.enable();
+		scanItem.scanAnItem(item);
+		station.mainScanner.scan(item); 
+	//	area.bagItemAfterScanning();
+	//	assertTrue(scanItem.getHasItemBeenBagged());
+
+	}
 	
 }
