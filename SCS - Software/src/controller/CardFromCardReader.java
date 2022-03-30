@@ -86,6 +86,7 @@ public class CardFromCardReader implements CardReaderObserver{
 	}
 	
 	
+	//checks to see if an inserted card has been removed after payment
 	public void checkCardRemoved() {
 		while(cardInserted == true) {
 			station.cardReader.disable();
