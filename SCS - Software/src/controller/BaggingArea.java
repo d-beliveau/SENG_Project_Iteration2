@@ -154,37 +154,30 @@ public class BaggingArea implements ElectronicScaleObserver{
 		   itemsToBeBagged.add(theScanner.getScanneditems().get(j));
 	   }
 	   
-	   if(itemsToBeBagged.isEmpty());
+	   if(itemsToBeBagged.isEmpty())
 		   // no items to be bagged 
+	   		throw new SimulationException("No item scanned before bagginng");
 	   else
 	   {
-		   try
+		   itemTooLight = false;
+		   placeItem(itemsToBeBagged.get(-1));
+		   if((currentWeight == previousWeight) && (itemsToBeBagged.get(0).getWeight() != 0))
+			   // itemWeight < sensitivity
 		   {
-			   itemTooLight = false;
-			   placeItem(itemsToBeBagged.get(-1));
-			   if((currentWeight == previousWeight) && (itemsToBeBagged.get(0).getWeight() != 0))
-				   // itemWeight < sensitivity
-			   {
-				   itemTooLight = true;
-			   }
-			   // checks if this item is actually placed else throw exception
-			   checkIfItemPlaced(itemsToBeBagged.get(-1));
-			   // checkIfItemPlaced(Item anItem) also enables the scanner ,
-			   
-			   
-			   // if it causes error remove "station.mainScanner.enable();" line from checkIfItemPlaced
-			   // and add it here
-			   
-			   
-			   itemsToBeBagged.remove(-1); // removing item after bagging
-			   
-			   // throw exception if item weight < sensitivity or item == null
+			   itemTooLight = true;
 		   }
-		   catch(NullPointerException npe)
-		   {
-			   System.out.println("No item to bag");
-		   }
-		  
+		   // checks if this item is actually placed else throw exception
+		   checkIfItemPlaced(itemsToBeBagged.get(-1));
+		   // checkIfItemPlaced(Item anItem) also enables the scanner ,
+		   
+		   
+		   // if it causes error remove "station.mainScanner.enable();" line from checkIfItemPlaced
+		   // and add it here
+		   
+		   
+		   itemsToBeBagged.remove(-1); // removing item after bagging
+		   
+		   // throw exception if item weight < sensitivity or item == null
 	   }
    }
 
