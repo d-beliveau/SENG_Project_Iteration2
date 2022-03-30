@@ -37,10 +37,12 @@ public class CustomerCheckout{
 	private SelfCheckoutStation station;
 	private CardFromCardReader cardLogic;
 	private PayCash cashLogic;
-	private BigDecimal amountOwed;
+	private BigDecimal amountOwed = new BigDecimal(0);
 	
 	public CustomerCheckout(SelfCheckoutStation station) {
 		this.station = station;
+		cashLogic = new PayCash(station, new BigDecimal(0));
+		cardLogic = new CardFromCardReader(station);
 	}
 	
 	
@@ -78,7 +80,7 @@ public class CustomerCheckout{
 
 	//Customer choose to use debit or credit card for payment
 	public void payWithDebitOrCredit(BigDecimal payment) {
-		cardLogic.paymentAmount = payment;
+		getCardLogic().paymentAmount = payment;
 		station.cardReader.enable();
 		
 		station.mainScanner.disable();
@@ -90,7 +92,10 @@ public class CustomerCheckout{
 	//Customer choose this as final option they are done with all payment
 	public boolean confirmPurchase() {
 		 int res;
-		 BigDecimal amountPayed = cashLogic.getTotalPayment().add(cardLogic.paymentTotal);
+		 BigDecimal amountPayed = cashLogic.getTotalPayment().add(getCardLogic().paymentTotal);
+		 System.out.println("cash " + cashLogic.getTotalPayment());
+		 System.out.println("cards " + getCardLogic().paymentTotal);
+		 System.out.println("total " + amountPayed);
 	     res = getAmountOwed().compareTo(amountPayed);
 
 	     //Return false if customer has not paid for everything
@@ -125,6 +130,16 @@ public class CustomerCheckout{
 
 	public void setAmountOwed(BigDecimal amountOwed) {
 		this.amountOwed = amountOwed;
+	}
+
+
+	public CardFromCardReader getCardLogic() {
+		return cardLogic;
+	}
+
+
+	public void setCardLogic(CardFromCardReader cardLogic) {
+		this.cardLogic = cardLogic;
 	}
 	
 }

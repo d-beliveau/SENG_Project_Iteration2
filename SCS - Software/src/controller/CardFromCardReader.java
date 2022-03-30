@@ -23,10 +23,10 @@ public class CardFromCardReader implements CardReaderObserver{
 	private String cardNumber;
 	private String cardType;
 	private boolean success = false;
-	private BankStub bank = new BankStub();
 	
-	protected BigDecimal paymentAmount;
-	protected BigDecimal paymentTotal;
+	private BankStub bank = new BankStub();
+	protected BigDecimal paymentAmount = new BigDecimal(0);
+	protected BigDecimal paymentTotal = new BigDecimal(0);
 	protected String memberNumber;
 	
 	public CardFromCardReader(SelfCheckoutStation station) {
@@ -38,15 +38,14 @@ public class CardFromCardReader implements CardReaderObserver{
 	public boolean payWithDebit(CardData cardData) {
 		boolean paymentSuccessful = false;
 		BigDecimal funds = null;
-		
 		String cardNum = cardData.getNumber();
 		if(bank.getAvailableDebitFunds(cardNum).compareTo(paymentAmount) < 0) {
 			paymentSuccessful = false;
 		}
-		if(bank.getAvailableDebitFunds(cardNum).compareTo(paymentAmount) >= 0){
+		if(getBank().getAvailableDebitFunds(cardNum).compareTo(paymentAmount) >= 0){
 			paymentSuccessful = true;
-			funds = bank.getAvailableDebitFunds(cardNum).subtract(paymentAmount);
-			bank.setAvailableDebitFunds(cardNum, funds);
+			funds = getBank().getAvailableDebitFunds(cardNum).subtract(paymentAmount);
+			getBank().setAvailableDebitFunds(cardNum, funds);
 		}
 		
 		return paymentSuccessful;
@@ -59,13 +58,13 @@ public class CardFromCardReader implements CardReaderObserver{
 		BigDecimal funds = null;
 		
 		String cardNum = cardData.getNumber();
-		if(bank.getAvailableCreditFunds(cardNum).compareTo(paymentAmount) < 0) {
+		if(getBank().getAvailableCreditFunds(cardNum).compareTo(paymentAmount) < 0) {
 			paymentSuccessful = false;
 		}
-		if(bank.getAvailableCreditFunds(cardNum).compareTo(paymentAmount) >= 0){
+		if(getBank().getAvailableCreditFunds(cardNum).compareTo(paymentAmount) >= 0){
 			paymentSuccessful = true;
-			funds = bank.getAvailableCreditFunds(cardNum).subtract(paymentAmount);
-			bank.setAvailableCreditFunds(cardNum, funds);
+			funds = getBank().getAvailableCreditFunds(cardNum).subtract(paymentAmount);
+			getBank().setAvailableCreditFunds(cardNum, funds);
 		}
 		
 		return paymentSuccessful;		
@@ -89,6 +88,14 @@ public class CardFromCardReader implements CardReaderObserver{
 	}
 	
 	
+	public BankStub getBank() {
+		return bank;
+	}
+
+	public void setBank(BankStub bank) {
+		this.bank = bank;
+	}
+
 	@Override
 	public void cardDataRead(CardReader reader, CardData data) {
 		cardData = data;
@@ -108,7 +115,7 @@ public class CardFromCardReader implements CardReaderObserver{
 		}
 		
 		if (success == true) {
-			paymentTotal.add(paymentAmount);
+			paymentTotal = paymentTotal.add(paymentAmount);
 		}
 		reset();
 	}
