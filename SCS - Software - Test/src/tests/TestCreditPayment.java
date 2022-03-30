@@ -19,6 +19,7 @@ public class TestCreditPayment {
 	
 	CardFromCardReader cardRead;
 	Card credit;
+	BigDecimal creditLimitBefore;
 	BankStub bank = new BankStub();
 	
 	Currency currency = Currency.getInstance("CAD");
@@ -39,11 +40,34 @@ public class TestCreditPayment {
 		
 		credit = new Card("Credit", "12345678", "A Person", "123", "5555", true, true);
 		bank.setAvailableCreditLimit("12345678", new BigDecimal(1000.00));
+		creditLimitBefore = bank.getAvailableCreditLimit("12345678");
+		
+		cardRead.resetPaymentTotal();
 	}
 	
+	//checking available credit limit after payment
+	@Test
+	public void TestCreditLimitAfterPurchase() {
+		BigDecimal payment = new BigDecimal(500.00);
+		
+		checkout.payWithDebitOrCredit(payment);
+		
+		try {
+			station.cardReader.tap(credit);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(creditLimitBefore, bank.getAvailableCreditLimit("12345678").add(payment));
+		
+		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
+		
+	}
+	
+
 	@Test
 	public void TestWhenEnoughFundsToPayTap() {
-		BigDecimal payment = new BigDecimal(999.99);
+		BigDecimal payment = new BigDecimal(355.67);
 		
 		checkout.payWithDebitOrCredit(payment);
 		
@@ -57,18 +81,17 @@ public class TestCreditPayment {
 		
 		assertEquals(payment, cardRead.getPaymentTotal());
 		
-		BigDecimal funds = bank.getAvailableCreditLimit("12345678");
-		bank.setAvailableCreditLimit(null, funds.add(payment));
+		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
 		
 	}
 	
 	@Test
 	public void TestWhenEnoughFundsToPaySwipe() {
-		BigDecimal payment = new BigDecimal(999.99);
+		BigDecimal payment = new BigDecimal(789.32);
 		
 		checkout.payWithDebitOrCredit(payment);
 		
-		//simulating a transaction with tap
+		//simulating a transaction with swipe
 		
 		try {
 			station.cardReader.swipe(credit);
@@ -78,10 +101,31 @@ public class TestCreditPayment {
 		
 		assertEquals(payment, cardRead.getPaymentTotal());
 		
-		BigDecimal funds = bank.getAvailableCreditLimit("12345678");
-		bank.setAvailableCreditLimit(null, funds.add(payment));
+		
+		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
 		
 	}
+	
+	public void TestWhenEnoughFundsToPayInsert() {
+		BigDecimal payment = new BigDecimal(100.00);
+		
+		checkout.payWithDebitOrCredit(payment);
+		
+		//simulating a transaction with tap
+		
+		try {
+			station.cardReader.insert(credit, "5555");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(payment, cardRead.getPaymentTotal());
+		
+		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
+		
+	}
+	
+	
 	
 	@Test
 	public void TestWhenNotEnoughFunds() {
