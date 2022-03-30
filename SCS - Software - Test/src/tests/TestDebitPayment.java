@@ -23,12 +23,14 @@ public class TestDebitPayment {
     
 	@Before
 	public void setUp() {
-		 Currency currency = Currency.getInstance("USD");
+		Currency currency = Currency.getInstance("USD");
 	     int[] ints = {5, 10, 20, 50};
 	     BigDecimal[] decs = {new BigDecimal(".05"), new BigDecimal(".1"), new BigDecimal(".25")};
 	     station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
-	     bank.setAvailableCreditFunds("12345678", new BigDecimal(100));
-	     bank.setAvailableDebitFunds("87654321", new BigDecimal(100));
+	     checkoutTest = new CustomerCheckout(station);
+	     bank.setAvailableCreditLimit("87654321", new BigDecimal(100));
+	     bank.setAvailableDebitFunds("12345678", new BigDecimal(100));
+	     checkoutTest.getCardLogic().setBank(bank);
 	}
 	
 	 @Test
@@ -39,6 +41,16 @@ public class TestDebitPayment {
 		 station.cardReader.tap(debitCard);
 
 		 assertTrue(checkoutTest.confirmPurchase());
+	 }
+	 
+	 @Test
+	 public void debitFundsNotAvailable() throws IOException {
+		 checkoutTest.startPurchase();
+		 checkoutTest.setAmountOwed(new BigDecimal(100));
+		 checkoutTest.payWithDebitOrCredit(new BigDecimal(50));
+		 station.cardReader.tap(debitCard);
+
+		 assertFalse(checkoutTest.confirmPurchase());
 	 }
 
 }
