@@ -1,16 +1,30 @@
 package tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Currency;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.lsmr.selfcheckout.Card;
+import org.lsmr.selfcheckout.ChipFailureException;
+import org.lsmr.selfcheckout.MagneticStripeFailureException;
+import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
+
+import controller.BankStub;
+import controller.CardFromCardReader;
+import controller.CustomerCheckout;
 
 import org.junit.*;
 import org.lsmr.selfcheckout.*;
 import org.lsmr.selfcheckout.devices.*;
 
 import controller.*;
+
 public class TestDebitPayment {
 	
 	private BigDecimal previousFunds;
@@ -28,7 +42,7 @@ public class TestDebitPayment {
 	     int[] ints = {5, 10, 20, 50};
 	     BigDecimal[] decs = {new BigDecimal(".05"), new BigDecimal(".1"), new BigDecimal(".25")};
 	     station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
-	     checkoutTest = new CustomerCheckout(station);
+	     checkoutTest = new CustomerCheckout(station, bank);
 	     bank.setAvailableCreditLimit("87654321", new BigDecimal(100));
 	     bank.setAvailableDebitFunds("12345678", new BigDecimal(100));
 	     checkoutTest.getCardLogic().setBank(bank);

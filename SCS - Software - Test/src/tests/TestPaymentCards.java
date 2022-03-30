@@ -27,7 +27,7 @@ public class TestPaymentCards {
 	     int[] ints = {5, 10, 20, 50};
 	     BigDecimal[] decs = {new BigDecimal(".05"), new BigDecimal(".1"), new BigDecimal(".25")};
 	     station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
-	     checkoutTest = new CustomerCheckout(station);
+	     checkoutTest = new CustomerCheckout(station, bank);
 	     bank.setAvailableCreditLimit("87654321", new BigDecimal(100));
 	     bank.setAvailableDebitFunds("12345678", new BigDecimal(100));
 	     checkoutTest.getCardLogic().setBank(bank);
