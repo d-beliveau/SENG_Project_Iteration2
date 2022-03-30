@@ -29,9 +29,7 @@ public class TestDebitPayment {
 	
 	 @Test
 	 public void debitFundsAvailable() {
-		 cardRead = new CardFromCardReader(station);
 		 
-		 station.cardReader.attach(cardRead);
 	 }
 
 }
