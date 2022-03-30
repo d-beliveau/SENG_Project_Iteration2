@@ -19,7 +19,9 @@
  Assignment: Project, Iteration 01
  ******************************************************************************/
 
-package tests;
+
+// some tests make the program stop for a few seconds
+package controller;
 
 import org.lsmr.selfcheckout.*;
 import org.lsmr.selfcheckout.devices.*;
@@ -164,5 +166,32 @@ public class TestBaggingArea {
 		}
 	}
 	
+	@Test
+	public void testItemNotAddedAfterScanning() throws InterruptedException
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		station.mainScanner.scan(item);
+		Thread.sleep(5001);
+		ScanItem scanItem = new ScanItem(station);
+		assertFalse(scanItem.getHasItemBeenBagged());
+	}
+	
+	@Test
+	public void testItemAddedAfterScanning() throws InterruptedException
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		ScanItem scanItem = new ScanItem(station);
+		station.mainScanner.enable();
+		scanItem.scanAnItem(item);
+		station.mainScanner.scan(item);
+		Thread.sleep(2000);
+		assertTrue(scanItem.getHasItemBeenBagged());
+	}
+	
+	@
 	
 }
