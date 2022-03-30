@@ -67,10 +67,11 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
+				
 				if(e instanceof ChipFailureException) {
 					continue;
 				}
-				else {
+				else { 
 					e.printStackTrace();
 					break;
 				}

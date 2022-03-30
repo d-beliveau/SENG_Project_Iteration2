@@ -100,6 +100,7 @@ public class CardFromCardReader implements CardReaderObserver{
 		cardNumber = null;
 		cardData = null;
 		success = false;
+		paymentAmount = new BigDecimal("0");
 	}
 	
 
