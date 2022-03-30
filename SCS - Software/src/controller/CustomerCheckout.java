@@ -21,6 +21,8 @@
 
 package controller;
 
+import java.math.BigDecimal;
+
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 
 /**
@@ -29,35 +31,83 @@ import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
  */
 
 // Control software for 'customer wishes to checkout' use case 
+
 public class CustomerCheckout{
 	
 	private SelfCheckoutStation station;
 	
 	public CustomerCheckout(SelfCheckoutStation station) {
 		this.station = station;
-		beforeCheckout();
 	}
 	
 	
-	public void beforeCheckout() {
+	//Checkout station state before customer starts using the station
+	public void beforeStartPurchase() {
+		station.mainScanner.disable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+		station.cardReader.disable();
+	}
+	
+	//Checkout station state after customer press start purchase button
+	public void startPurchase() {
 		station.mainScanner.enable();
 		station.coinSlot.disable();
 		station.banknoteInput.disable();
 		station.cardReader.disable();
 	}
 	
-	
-	public void customerFinishAddingItem() {
+	//Customer choose to pay with bank note and coin
+	public void payWithBankNoteAndCoin() {
 		station.mainScanner.disable();
+		station.cardReader.disable();
+		
 		station.coinSlot.enable();
 		station.banknoteInput.enable();
-		station.cardReader.enable();
 	}
 	
-	public void additionItemAfterPartialPayment() {
+	//Customer chooses to use membership card
+	public void useMembershipCard() {
+		station.cardReader.enable();
+	}
+
+	//Customer choose to use debit or credit card for payment
+	public void payWithDebitOrCredit() {
+		station.cardReader.enable();
+		
+		station.mainScanner.disable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+	}
+	
+	
+	//Customer choose this as final option they are done with all payment
+	public boolean confirmPurchase(BigDecimal amountOwed) {
+		 int res;
+	     res = amountOwed.compareTo(new BigDecimal(0));
+
+	     //Return false if customer has not paid for everything
+	     if( res == 1 ) {
+	         return false;
+	     }
+		
+		station.mainScanner.disable();
+		station.coinSlot.disable();
+		station.banknoteInput.disable();
+		station.cardReader.disable();
+		
+		//Returns true if everything is paid for
+		return true;
+		
+	}
+	
+	//Customer wishes to add more items even after partial payment
+	public void addItemToScanner() {
 		station.mainScanner.enable();
+		
 		station.coinSlot.disable();
 		station.banknoteInput.disable();
 		station.cardReader.disable();
 	}
+	
 }

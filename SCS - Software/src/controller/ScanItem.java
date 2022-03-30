@@ -40,6 +40,7 @@ import org.lsmr.selfcheckout.devices.observers.BarcodeScannerObserver;
 import org.lsmr.selfcheckout.devices.observers.CardReaderObserver;
 
 // Controller class for 'customer scans item' use case
+// Use case for partial payment
 public class ScanItem implements BarcodeScannerObserver{
 
 	private Dictionary<Barcode, BarcodedProduct> Products = new Hashtable<Barcode, BarcodedProduct>();
@@ -153,6 +154,7 @@ public class ScanItem implements BarcodeScannerObserver{
 	
 	
 	//BillPrice Getter
+	//Recalculates correct bill price even after partial payment
 	public BigDecimal GetBillPrice(BigDecimal partialPayment) {
 		TallyBillPrice();
 		billprice = billprice.subtract(partialPayment);
