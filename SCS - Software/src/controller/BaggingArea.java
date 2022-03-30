@@ -38,8 +38,10 @@ import org.lsmr.selfcheckout.devices.observers.ElectronicScaleObserver;
 public class BaggingArea implements ElectronicScaleObserver{
    final private SelfCheckoutStation station;
    final private ElectronicScale baggingArea;
+   private double previousWeight;
    private double currentWeight;
    private boolean overloaded;
+   private boolean itemTooLight;
    
    // removed Item has a global variable (change) 
    
@@ -96,38 +98,49 @@ public class BaggingArea implements ElectronicScaleObserver{
        theScanner = new ScanItem(station); // only exists once the baggibgArea is linked to the station
    }
 
-   // Get scanned item from scanner
-   public void scanBaggingItem(BarcodedItem barcodedItem) {
-//       this.item = barcodedItem;
-       station.mainScanner.disable();
-   }
+//   // Get scanned item from scanner
+//   public void scanBaggingItem(BarcodedItem barcodedItem) {
+////       this.item = barcodedItem;
+//       station.mainScanner.disable();
+//   }
 
    // Simulate placing an item into bagging area
    public void placeItem(Item item) {
        if (item == null)
            throw new SimulationException("Trying to place an empty item into bagging area.");
        else
+       {
+    	   previousWeight = currentWeight;
            getBaggingAreaScale().add(item);
+    	   station.mainScanner.disable();
+       }
+       
    }
    
    // Check if the weight added on scale equals to the weight of item
-   private void checkIfItemPlaced(Item anItem) throws OverloadException {
-       if (baggingArea.getCurrentWeight() - currentWeight == anItem.getWeight()) {
+   public void checkIfItemPlaced(Item anItem) throws OverloadException {
+	   if(currentWeight - previousWeight == anItem.getWeight())
+    	   // as the getCurrentWeight() method returns a slightly randomized value
            station.mainScanner.enable();
-       }
    }
+   
+   
    
    
  //------------------------------------------------------------------------------------------------------------------------------------------
    // customer adding bag method
    public void addCustomerBag() throws OverloadException{
 	   double bagWeight = baggingArea.getCurrentWeight() - currentWeight;
-	   currentWeight = bagWeight;
+	   currentWeight = currentWeight + bagWeight;
+	   // even though this weight might be a bit messed up as due to the randomness in getCurrentWeight()
+	   // but its set to the exact weight when adding/removing an item due to weightChanged()
    }
    
    // customer removing bag method
    public void removeCustomerBag() throws OverloadException{
-	   currentWeight = 0.0;
+	   currentWeight = baggingArea.getCurrentWeight();
+	   // even though this weight might be a bit messed up as due to the randomness in getCurrentWeight()
+	   // but its set to the exact weight when adding/removing an item due to weightChanged()
    }
    
    // i am considering an item has to be bagged right after being scanned
@@ -145,18 +158,50 @@ public class BaggingArea implements ElectronicScaleObserver{
 		   // no items to be bagged 
 	   else
 	   {
-		   placeItem(itemsToBeBagged.get(0));
-		   // have to check if this item is actually placed else throw exception
-		   checkIfItemPlaced(itemsToBeBagged.get(0));
-		   // checkIfItemPlaced(Item anItem) also enables the scanner ,
-		   // if it causes error remove "station.mainScanner.enable();" line from checkIfItemPlaced
-		   // and add it here
-		   // MORE CODE TO ADD RIGHT HERE
-		   
-		   itemsToBeBagged.remove(0); // removing item after bagging
-		   
-		   // throw exception if item weight < sensitivity or item == null
+		   try
+		   {
+			   itemTooLight = false;
+			   placeItem(itemsToBeBagged.get(0));
+			   if((currentWeight == previousWeight) && (itemsToBeBagged.get(0).getWeight() != 0))
+				   // itemWeight < sensitivity
+			   {
+				   itemTooLight = true;
+			   }
+			   // checks if this item is actually placed else throw exception
+			   checkIfItemPlaced(itemsToBeBagged.get(0));
+			   // checkIfItemPlaced(Item anItem) also enables the scanner ,
+			   
+			   
+			   // if it causes error remove "station.mainScanner.enable();" line from checkIfItemPlaced
+			   // and add it here
+			   
+			   
+			   itemsToBeBagged.remove(0); // removing item after bagging
+			   
+			   // throw exception if item weight < sensitivity or item == null
+		   }
+		   catch(NullPointerException npe)
+		   {
+			   System.out.println("No item to bag");
+		   }
 		  
 	   }
    }
+
+   public ElectronicScale getScale() {
+	   return baggingArea;
+   }
+   
+   public void removeItem(Item item)
+   {
+	   if (item == null)
+           throw new SimulationException("Trying to remove an empty item from bagging area.");
+       else
+           getBaggingAreaScale().remove(item);
+	   
+   }
+
+public boolean isItemTooLight() {
+	return itemTooLight;
+}
 }
