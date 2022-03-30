@@ -125,6 +125,7 @@ public class TestPaymentCards {
 	public void TestCreditLimitAfterPurchase() {
 		BigDecimal payment = new BigDecimal(500.00);
 		checkoutTest.payWithDebitOrCredit(payment);
+		
 		//simulates someone retrying tap if read unsuccessful
 		implementTap(creditCard);
 
@@ -134,25 +135,26 @@ public class TestPaymentCards {
 		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
 	}
 
-
+	//tests credit card payment via tap
 	@Test
 	public void TestWhenEnoughFundsToPayTap() {
 		BigDecimal payment = new BigDecimal(355.67);
 		checkoutTest.payWithDebitOrCredit(payment);
-		//simulating a transaction with tap
-
+		
+		//simulates someone retrying tap if read unsuccessful
 		implementTap(creditCard);
 
 		station.cardReader.remove();
 		//checks cardReader controller payment total
 		assertEquals(payment, creditCardRead.getPaymentTotal());
 	}
-
+	
+	//tests credit card payment via swipe
 	@Test
 	public void TestWhenEnoughFundsToPaySwipe() {
 		BigDecimal payment = new BigDecimal(789.32);
 		checkoutTest.payWithDebitOrCredit(payment);
-		//simulating a transaction with swipe
+		
 		//if swipe does not read data, simulates customer trying again
 		implementSwipe(creditCard);
 
@@ -160,7 +162,7 @@ public class TestPaymentCards {
 		assertEquals(payment, creditCardRead.getPaymentTotal());
 	}
 
-
+	//tests credit card payment via insert
 	@Test
 	public void TestWhenEnoughFundsToPayInsert() {
 		BigDecimal payment = new BigDecimal(100.00);
@@ -172,7 +174,7 @@ public class TestPaymentCards {
 		assertEquals(payment, creditCardRead.getPaymentTotal());
 	}
 
-
+	//payment should go through when credit card limit available is barely enough
 	@Test
 	public void TestCloseToCreditLimitBelow() {
 		BigDecimal payment = new BigDecimal(999.99);
@@ -185,7 +187,7 @@ public class TestPaymentCards {
 		assertEquals(payment, creditCardRead.getPaymentTotal());
 	}
 
-
+	//payment should not go through if available credit limit is extremely close to enough (but not enough)
 	@Test
 	public void TestCloseToCreditLimitAbove() {
 		BigDecimal payment = new BigDecimal(1000.01);
@@ -198,7 +200,7 @@ public class TestPaymentCards {
 		assertEquals(new BigDecimal(0), creditCardRead.getPaymentTotal());
 	}
 
-
+	//payment should not go through if available credit limit is not enough for the purchase
 	@Test
 	public void TestWhenNotEnoughFunds() {
 		BigDecimal payment = new BigDecimal(1500.00);
@@ -210,7 +212,7 @@ public class TestPaymentCards {
 		assertEquals(new BigDecimal(0), creditCardRead.getPaymentTotal());
 	}
 
-
+	//card reader should be enabled it card is removed after a successful payment
 	@Test
 	public void TestWhenCustomerRemovesCardAfterPayment() {
 		BigDecimal payment = new BigDecimal(50.00);
@@ -222,7 +224,7 @@ public class TestPaymentCards {
 		assertFalse(station.cardReader.isDisabled());	
 	}
 
-
+	//card reader should be disabled when card is not removed after payment is successful
 	@Test
 	public void TestWhenCustomerDoesNotRemoveCardAfterPayment() {
 		BigDecimal payment = new BigDecimal(50.00);
@@ -269,7 +271,7 @@ public class TestPaymentCards {
 		assertFalse(checkoutTest.confirmPurchase());
 
 	}
-
+	//simulates someone re-inserting the card upon an unsuccessful card read
 	public void implementInsertCredit(Card card) {
 
 		while(!readSuccessful) {
@@ -287,7 +289,8 @@ public class TestPaymentCards {
 			}
 		}
 	}
-
+	
+	//simulates someone re-inserting the card upon an unsuccessful card read
 	public void implementInsertDebit(Card card) {
 
 		while(!readSuccessful) {
@@ -306,6 +309,7 @@ public class TestPaymentCards {
 		}
 	}
 
+	//simulates someone retrying tap if read unsuccessful
 	public void implementTap(Card card) {
 
 		while(!readSuccessful) {
@@ -313,6 +317,8 @@ public class TestPaymentCards {
 				station.cardReader.tap(card);
 				readSuccessful = true;
 			} catch (IOException e) {
+				/**the CardReader class throws a ChipFailureException for tap but the Card class throws a TapFailureException
+				hence why there are both here **/
 				if(e instanceof TapFailureException || e instanceof ChipFailureException) {
 					continue;
 				}
@@ -324,6 +330,7 @@ public class TestPaymentCards {
 		}
 	}
 
+	//if swipe does not read data, simulates customer trying again
 	public void implementSwipe(Card card) {
 
 		while(!readSuccessful) {
