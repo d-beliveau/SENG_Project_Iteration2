@@ -28,7 +28,7 @@ public class TestPaymentCards {
 	     BigDecimal[] decs = {new BigDecimal(".05"), new BigDecimal(".1"), new BigDecimal(".25")};
 	     station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
 	     checkoutTest = new CustomerCheckout(station);
-	     bank.setAvailableCreditFunds("87654321", new BigDecimal(100));
+	     bank.setAvailableCreditLimit("87654321", new BigDecimal(100));
 	     bank.setAvailableDebitFunds("12345678", new BigDecimal(100));
 	     checkoutTest.getCardLogic().setBank(bank);
 	 }
@@ -37,8 +37,9 @@ public class TestPaymentCards {
 	  * Tests that member number is correctly printed on receipt
 	  */
 	 @Test
-	 public void memberReceipt() {
-		 
+	 public void memberReceipt() throws IOException{
+		 checkoutTest.useMembershipCard();
+		 station.cardReader.swipe(memberCard);
 	 }
 	 
 	 /*
@@ -58,12 +59,11 @@ public class TestPaymentCards {
 	 }
 	 
 	 /*
-	  * Tests to see if the payment will fail if a payment method fails
+	  * Tests to see if the multi-method payment will fail if a payment method fails
 	  */
-
 	 @Test
 	 public void payMixFail() throws IOException, DisabledException, OverloadException {
-		 bank.setAvailableDebitFunds("87654321", new BigDecimal(10));
+		 bank.setAvailableDebitFunds("12345678", new BigDecimal(10));
 		 checkoutTest.getCardLogic().setBank(bank);
 		 checkoutTest.setAmountOwed(new BigDecimal(100));
 		 checkoutTest.payWithDebitOrCredit(new BigDecimal(30));

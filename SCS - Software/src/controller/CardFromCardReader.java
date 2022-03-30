@@ -79,13 +79,8 @@ public class CardFromCardReader implements CardReaderObserver{
 
 	//MEMBERSHIP CARD METHOD
 	public void membershipCard(CardData cardData) {
-		memberNumber = cardData.getNumber();
+		System.out.println(memberNumber);
 	}
-	
-	public String getMemberNum() {
-		return memberNumber;
-	}
-	
 	
 	public BankStub getBank() {
 		return bank;

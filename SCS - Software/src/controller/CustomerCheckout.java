@@ -23,7 +23,8 @@ package controller;
 
 import java.math.BigDecimal;
 
-import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
+import org.lsmr.selfcheckout.devices.*;
+import org.lsmr.selfcheckout.products.*;
 
 /**
  * In this stage there's no way to interact with the user,
@@ -38,11 +39,13 @@ public class CustomerCheckout{
 	private CardFromCardReader cardLogic;
 	private PayCash cashLogic;
 	private BigDecimal amountOwed = new BigDecimal(0);
+	ReceiptPrinter printer;
 	
 	public CustomerCheckout(SelfCheckoutStation station) {
 		this.station = station;
 		cashLogic = new PayCash(station, new BigDecimal(0));
 		cardLogic = new CardFromCardReader(station);
+		printer = station.printer;
 	}
 	
 	
@@ -89,20 +92,39 @@ public class CustomerCheckout{
 	}
 	
 	
-	//Customer choose this as final option they are done with all payment
+	//Customer choose this as final option they are done with all payment, prints reciept
 	public boolean confirmPurchase() {
 		 int res;
 		 BigDecimal amountPayed = cashLogic.getTotalPayment().add(getCardLogic().paymentTotal);
-		 System.out.println("cash " + cashLogic.getTotalPayment());
-		 System.out.println("cards " + getCardLogic().paymentTotal);
-		 System.out.println("total " + amountPayed);
 	     res = getAmountOwed().compareTo(amountPayed);
 
 	     //Return false if customer has not paid for everything
 	     if( res == 1 ) {
 	         return false;
 	     }
-		
+	 	
+	 	/*
+	 	 * Code from Iteration 1 - Group 48
+	 	
+	 	for(Product product : products) {
+	 		String toPrint = "$" + product.getPrice().setScale(2, RoundingMode.HALF_EVEN) + "\n";
+	 		for(char c : toPrint.toCharArray()) {
+	 			printer.print(c);
+	 		}
+	 	}
+	 	
+	 	String endString = "Total:\n" + "$" + new BigDecimal(totalCost).setScale(2, RoundingMode.HALF_EVEN);
+	 	for(char c : endString.toCharArray()) {
+	 		printer.print(c);
+	 	}
+	 	*/
+	    if(cardLogic.memberNumber != null) {
+		 	for(char c :cardLogic.memberNumber.toCharArray()) {
+		 		printer.print(c);
+		 	}
+	    }
+	 	printer.cutPaper();
+	
 		station.mainScanner.disable();
 		station.coinSlot.disable();
 		station.banknoteInput.disable();
