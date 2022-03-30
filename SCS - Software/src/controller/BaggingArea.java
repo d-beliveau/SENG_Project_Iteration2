@@ -42,6 +42,7 @@ public class BaggingArea implements ElectronicScaleObserver{
    private double currentWeight;
    private boolean overloaded;
    private boolean itemTooLight;
+   private double scanItemExpectedWeight = 0;
    
    // removed Item has a global variable (change) 
    
@@ -58,11 +59,20 @@ public class BaggingArea implements ElectronicScaleObserver{
 
    }
 
+   
+   public void setScanItemExpectedWeight(double scanItemExpectedWeight) {
+	   scanItemExpectedWeight = this.scanItemExpectedWeight;
+   }
+
    @Override
    // Will be called when the scale detects changes in weight
    public void weightChanged(ElectronicScale scale, double weightInGrams) {
 //     checkIfItemPlaced(weightInGrams);
        currentWeight = weightInGrams;
+       
+       if(currentWeight == scanItemExpectedWeight) {
+    	   station.mainScanner.enable();
+       }
    }
 
    @Override
@@ -86,6 +96,7 @@ public class BaggingArea implements ElectronicScaleObserver{
    public boolean isOverloaded() {
        return overloaded;
    }
+   
 
    // Set up the scale and attach the observer
    public BaggingArea(SelfCheckoutStation station) {
@@ -96,13 +107,10 @@ public class BaggingArea implements ElectronicScaleObserver{
        
        // change
        theScanner = new ScanItem(station); // only exists once the baggibgArea is linked to the station
+    
+   
    }
 
-//   // Get scanned item from scanner
-//   public void scanBaggingItem(BarcodedItem barcodedItem) {
-////       this.item = barcodedItem;
-//       station.mainScanner.disable();
-//   }
 
    // Simulate placing an item into bagging area
    public void placeItem(Item item) {

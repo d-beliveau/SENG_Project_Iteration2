@@ -25,6 +25,7 @@ import org.lsmr.selfcheckout.*;
 import org.lsmr.selfcheckout.devices.*;
 
 import controller.BaggingArea;
+import controller.ScanItem;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,19 @@ import static org.junit.Assert.*;
 public class TestBaggingArea {
 	private BaggingArea area;
 	private SelfCheckoutStation station;
+	
+	
+    //Numerals
+    private Numeral[] soupCode = new Numeral[] {Numeral.valueOf((byte)0b000)};
+    private Numeral[] doritoCode = new Numeral[] {Numeral.valueOf((byte)0b111)};
+
+	 //Barcodes
+    private Barcode soupBar = new Barcode(soupCode);
+    private Barcode doritoBar = new Barcode(doritoCode);
+
+    //Items
+    private BarcodedItem soupItem;
+    private BarcodedItem doritoItem;
 
 	@Before
 	public void setup() {
@@ -44,6 +58,13 @@ public class TestBaggingArea {
 		BigDecimal[] decs = {new BigDecimal(.05), new BigDecimal(.1), new BigDecimal(.25)};
 		station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
 		area = new BaggingArea(station);
+		
+		
+		 //Set-up items
+        this.soupItem = new BarcodedItem(soupBar, 50);
+        this.doritoItem = new BarcodedItem(doritoBar, 50);
+		
+		
 	}
 
 	@Test
@@ -162,6 +183,11 @@ public class TestBaggingArea {
 		} catch(Exception e) {
 			fail("there should not have been an exception");
 		}
+	}
+	
+	@Test
+	public void testFailToPlaceItem() {
+		
 	}
 	
 	
