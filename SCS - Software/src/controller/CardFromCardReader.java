@@ -69,7 +69,6 @@ public class CardFromCardReader implements CardReaderObserver{
 		}
 		
 		return paymentSuccessful;		
-		
 	}
 	
 	public void reset() {
