@@ -342,10 +342,4 @@ public class TestPaymentCards {
 		}
 	}
 
-	/*
-	 @After
-	 public void after() {
-		 BigDecimal newFunds = bank.getAvailableDebitFunds("12345678");
-		 BigDecimal remainingLimit = bank.getAvailableCreditLimit("87654321");
-	 } */
 }
