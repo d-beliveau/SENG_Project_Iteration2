@@ -32,7 +32,7 @@ public class TestDebitPayment {
 	private CustomerCheckout checkoutTest;
     private SelfCheckoutStation station;
     private Card debitCard = new Card("Debit", "12345678", "tester", "123", "2222", true, true);
-    private Card creditCard = new Card("Credit", "87654321", "tester", "123", "1234", true, true);
+    private Card creditCard = new Card("Credit", "87654321", "tester", "123", "5555", true, true);
     private Card memberCard = new Card("Member", "55555555", "tester", "123", "1234", true, true);
     private Banknote banknote20 = new Banknote(Currency.getInstance("USD"), 20);
     private BankStub bank = new BankStub();
