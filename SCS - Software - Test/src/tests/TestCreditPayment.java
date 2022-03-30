@@ -57,11 +57,13 @@ public class TestCreditPayment {
 	
 	
 
-	//checking available credit limit after payment
+	//checking available credit limit in bank after payment
 	@Test
 	public void TestCreditLimitAfterPurchase() {
+		//payment amount
 		BigDecimal payment = new BigDecimal(500.00);
 		checkout.payWithDebitOrCredit(payment);
+		
 		//simulates someone retrying tap if read unsuccessful
 		while(!readSuccessful) {
 			try {
@@ -86,13 +88,15 @@ public class TestCreditPayment {
 		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
 	}
 	
-
+	
+	
+	//tests payment through tap
 	@Test
 	public void TestWhenEnoughFundsToPayTap() {
 		BigDecimal payment = new BigDecimal(355.67);
 		checkout.payWithDebitOrCredit(payment);
-		//simulating a transaction with tap
 		
+		//simulates someone retrying tap if read unsuccessful
 		while(!readSuccessful) {
 			try {
 				station.cardReader.tap(credit);
@@ -113,11 +117,15 @@ public class TestCreditPayment {
 		assertEquals(payment, cardRead.getPaymentTotal());
 	}
 	
+	
+	
+	//checks payment with swipe
 	@Test
 	public void TestWhenEnoughFundsToPaySwipe() {
 		BigDecimal payment = new BigDecimal(789.32);
 		checkout.payWithDebitOrCredit(payment);
 		//simulating a transaction with swipe
+		
 		//if swipe does not read data, simulates customer trying again
 		while(!readSuccessful) {
 			try {
@@ -135,16 +143,19 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
+		//checks cardReader controller payment total
 		assertEquals(payment, cardRead.getPaymentTotal());
 	}
 	
 	
+	
+	//checks payment with tap
 	@Test
 	public void TestWhenEnoughFundsToPayInsert() {
 		BigDecimal payment = new BigDecimal(100.00);
 		checkout.payWithDebitOrCredit(payment);
 		
-		//simulating a transaction with tap
+		//simulates a customer re-inserting card if unsuccessfully read
 		while(!readSuccessful) {
 			try {
 				station.cardReader.insert(credit, "5555");
@@ -161,16 +172,19 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
+		//checks cardReader controller payment total
 		assertEquals(payment, cardRead.getPaymentTotal());
 	}
 	
 	
+	
+	//Checks if a payment goes through when extremely close to credit limit (but still enough)
 	@Test
 	public void TestCloseToCreditLimitBelow() {
 		BigDecimal payment = new BigDecimal(999.99);
 		checkout.payWithDebitOrCredit(payment);
 		
-		//simulating a transaction with tap
+		//simulating a customer retrying tap if unsuccessfully reads
 		while(!readSuccessful) {
 			try {
 				station.cardReader.tap(credit);
@@ -192,12 +206,14 @@ public class TestCreditPayment {
 	}
 	
 	
+	
+	//Checks if a payment goes through when extremely close to credit limit (but not enough)
 	@Test
 	public void TestCloseToCreditLimitAbove() {
 		BigDecimal payment = new BigDecimal(1000.01);
 		checkout.payWithDebitOrCredit(payment);
 		
-		//simulating a transaction with tap
+		//simulating a customer retrying tap if unsuccessfully reads
 		while(!readSuccessful) {
 			try {
 				station.cardReader.tap(credit);
@@ -219,11 +235,14 @@ public class TestCreditPayment {
 	}
 	
 	
+	
+	//tests for when credit limit is not enough
 	@Test
 	public void TestWhenNotEnoughFunds() {
 		BigDecimal payment = new BigDecimal(1500.00);
 		checkout.payWithDebitOrCredit(payment);
-				
+		
+		//simulating a customer retrying tap if unsuccessfully reads
 		while(!readSuccessful) {
 			try {
 				station.cardReader.tap(credit);
@@ -244,11 +263,14 @@ public class TestCreditPayment {
 	}
 	
 	
+	
+	//tests if card reader is enabled after customer removes card following payment
 	@Test
 	public void TestWhenCustomerRemovesCardAfterPayment() {
 		BigDecimal payment = new BigDecimal(50.00);
 		checkout.payWithDebitOrCredit(payment);
 		
+		//simulates a customer re-inserting card if unsuccessfully read
 		while(!readSuccessful) {
 			try {
 				station.cardReader.insert(credit, "5555");
@@ -269,11 +291,13 @@ public class TestCreditPayment {
 	}
 	
 	
+	//tests if card reader disabled when customer has not removed card after payment
 	@Test
 	public void TestWhenCustomerDoesNotRemoveCardAfterPayment() {
 		BigDecimal payment = new BigDecimal(50.00);
 		checkout.payWithDebitOrCredit(payment);
 		
+		//simulates a customer re-inserting card if unsuccessfully read
 		while(!readSuccessful) {
 			try {
 				station.cardReader.insert(credit, "5555");
