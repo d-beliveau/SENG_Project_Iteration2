@@ -23,10 +23,10 @@ public class CardFromCardReader implements CardReaderObserver{
 	private String cardNumber;
 	private String cardType;
 	private boolean success = false;
-	
 	private BankStub bank = new BankStub();
-	protected BigDecimal paymentAmount = new BigDecimal(0);
-	protected BigDecimal paymentTotal = new BigDecimal(0);
+	
+	protected BigDecimal paymentAmount;
+	protected BigDecimal paymentTotal;
 	protected String memberNumber;
 	
 	public CardFromCardReader(SelfCheckoutStation station) {
@@ -38,14 +38,15 @@ public class CardFromCardReader implements CardReaderObserver{
 	public boolean payWithDebit(CardData cardData) {
 		boolean paymentSuccessful = false;
 		BigDecimal funds = null;
+		
 		String cardNum = cardData.getNumber();
 		if(bank.getAvailableDebitFunds(cardNum).compareTo(paymentAmount) < 0) {
 			paymentSuccessful = false;
 		}
-		if(getBank().getAvailableDebitFunds(cardNum).compareTo(paymentAmount) >= 0){
+		if(bank.getAvailableDebitFunds(cardNum).compareTo(paymentAmount) >= 0){
 			paymentSuccessful = true;
-			funds = getBank().getAvailableDebitFunds(cardNum).subtract(paymentAmount);
-			getBank().setAvailableDebitFunds(cardNum, funds);
+			funds = bank.getAvailableDebitFunds(cardNum).subtract(paymentAmount);
+			bank.setAvailableDebitFunds(cardNum, funds);
 		}
 		
 		return paymentSuccessful;
@@ -58,13 +59,13 @@ public class CardFromCardReader implements CardReaderObserver{
 		BigDecimal funds = null;
 		
 		String cardNum = cardData.getNumber();
-		if(getBank().getAvailableCreditFunds(cardNum).compareTo(paymentAmount) < 0) {
+		if(bank.getAvailableCreditLimit(cardNum).compareTo(paymentAmount) < 0) {
 			paymentSuccessful = false;
 		}
-		if(getBank().getAvailableCreditFunds(cardNum).compareTo(paymentAmount) >= 0){
+		if(bank.getAvailableCreditLimit(cardNum).compareTo(paymentAmount) >= 0){
 			paymentSuccessful = true;
-			funds = getBank().getAvailableCreditFunds(cardNum).subtract(paymentAmount);
-			getBank().setAvailableCreditFunds(cardNum, funds);
+			funds = bank.getAvailableCreditLimit(cardNum).subtract(paymentAmount);
+			bank.setAvailableCreditLimit(cardNum, funds);
 		}
 		
 		return paymentSuccessful;		
@@ -82,6 +83,7 @@ public class CardFromCardReader implements CardReaderObserver{
 		System.out.println(memberNumber);
 	}
 	
+
 	public BankStub getBank() {
 		return bank;
 	}
@@ -89,6 +91,7 @@ public class CardFromCardReader implements CardReaderObserver{
 	public void setBank(BankStub bank) {
 		this.bank = bank;
 	}
+
 
 	@Override
 	public void cardDataRead(CardReader reader, CardData data) {
@@ -109,7 +112,7 @@ public class CardFromCardReader implements CardReaderObserver{
 		}
 		
 		if (success == true) {
-			paymentTotal = paymentTotal.add(paymentAmount);
+			paymentTotal.add(paymentAmount);
 		}
 		reset();
 	}
