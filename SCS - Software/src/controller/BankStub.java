@@ -13,40 +13,22 @@ public class BankStub {
 	private BigDecimal availableFunds;
 	private double creditLimit;
 	
-	private  HashMap<String , Double> creditLimitMap = new HashMap<>();
-	private  HashMap<String , BigDecimal> creditFundsAvailableMap = new HashMap<>();
-	private  HashMap<String , Double> debitLimitMap = new HashMap<>();
+	private  HashMap<String , BigDecimal> creditLimitAvailable = new HashMap<>();
 	private  HashMap<String , BigDecimal> debitFundsAvailableMap = new HashMap<>();
 
 	
 	public BankStub() {}
 	
-	public void setCreditLimit(String cardNumber, double limit) {
-		creditLimitMap.put(cardNumber, limit);
+	public void setAvailableCreditLimit(String cardNumber, BigDecimal funds) {
+		creditLimitAvailable.put(cardNumber, funds);
 	}
 	
-	public void setAvailableCreditFunds(String cardNumber, BigDecimal funds) {
-		creditFundsAvailableMap.put(cardNumber, funds);
-	}
-	
-	public double getCreditLimit(String cardNumber) {
-		return creditLimitMap.get(cardNumber);
-	}
-	
-	public BigDecimal getAvailableCreditFunds(String cardNumber) {
-		return creditFundsAvailableMap.get(cardNumber);
-	}
-	
-	public void setDebitLimit(String cardNumber, double limit) {
-		debitLimitMap.put(cardNumber, limit);
+	public BigDecimal getAvailableCreditLimit(String cardNumber) {
+		return creditLimitAvailable.get(cardNumber);
 	}
 	
 	public void setAvailableDebitFunds(String cardNumber, BigDecimal funds) {
 		debitFundsAvailableMap.put(cardNumber, funds);
-	}
-	
-	public double getDebitLimit(String cardNumber) {
-		return debitLimitMap.get(cardNumber);
 	}
 	
 	public BigDecimal getAvailableDebitFunds(String cardNumber) {
@@ -59,7 +41,7 @@ public class BankStub {
 		
 		//obtaining funds remaining
 		availableFunds = new BigDecimal(((new Random().nextDouble() * (creditLimit)) + 0.01)).setScale(2, RoundingMode.HALF_DOWN);
-		creditFundsAvailableMap.put(cardNumber, availableFunds);
+		creditLimitAvailable.put(cardNumber, availableFunds);
 		return availableFunds;
 	}
 	

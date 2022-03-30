@@ -59,13 +59,13 @@ public class CardFromCardReader implements CardReaderObserver{
 		BigDecimal funds = null;
 		
 		String cardNum = cardData.getNumber();
-		if(bank.getAvailableCreditFunds(cardNum).compareTo(paymentAmount) < 0) {
+		if(bank.getAvailableCreditLimit(cardNum).compareTo(paymentAmount) < 0) {
 			paymentSuccessful = false;
 		}
-		if(bank.getAvailableCreditFunds(cardNum).compareTo(paymentAmount) >= 0){
+		if(bank.getAvailableCreditLimit(cardNum).compareTo(paymentAmount) >= 0){
 			paymentSuccessful = true;
-			funds = bank.getAvailableCreditFunds(cardNum).subtract(paymentAmount);
-			bank.setAvailableCreditFunds(cardNum, funds);
+			funds = bank.getAvailableCreditLimit(cardNum).subtract(paymentAmount);
+			bank.setAvailableCreditLimit(cardNum, funds);
 		}
 		
 		return paymentSuccessful;		
