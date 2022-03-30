@@ -33,6 +33,14 @@ public class CardFromCardReader implements CardReaderObserver{
 		this.station = station;
 		station.cardReader.attach(this);
 	}
+	
+	public BigDecimal getPaymentTotal() {
+		return paymentTotal;
+	}
+	
+	public BigDecimal getPaymentAmount() {
+		return paymentAmount;
+	}
 
 	//DEBIT CARD METHOD
 	public boolean payWithDebit(CardData cardData) {
