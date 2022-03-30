@@ -341,7 +341,6 @@ public class TestScanItem {
     	//The scanner controller will recalculate how much you have not pay now 
     	//And send that value to the payCash controller
     	payCash.setAmountOwed(software.GetBillPrice(partialPayment));
-    	System.out.println(payCash.getAmountOwed());
     	
     	//Even after partial payment and scanning a new item
     	//Money owed should be $4 for both payCash and scan Item controller
