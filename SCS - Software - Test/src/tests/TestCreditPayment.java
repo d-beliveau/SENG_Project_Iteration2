@@ -32,7 +32,6 @@ public class TestCreditPayment {
 	BigDecimal[] coinDenominations = {BigDecimal.TEN};
 	
 
-	
 	SelfCheckoutStation station = new SelfCheckoutStation(currency, banknoteDenominations, coinDenominations, 10, 2);
 	CustomerCheckout checkout;
 	
@@ -47,6 +46,7 @@ public class TestCreditPayment {
 		station.cardReader.attach(cardRead);
 		station.cardReader.enable();
 		
+		//
 		credit = new Card("Credit", "12345678", "A Person", "123", "5555", true, true);
 		bank.setAvailableCreditLimit("12345678", new BigDecimal(1000.00));
 		creditLimitBefore = bank.getAvailableCreditLimit("12345678");
