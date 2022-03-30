@@ -41,19 +41,16 @@ public class TestCreditPayment {
 	public void setUp() {
 		bank = new BankStub();
 		checkout = new CustomerCheckout(station, bank);
-		
 		cardRead = checkout.getCardLogic();
 		
 		station.cardReader.attach(cardRead);
 		station.cardReader.enable();
-		
 		
 		credit = new Card("Credit", "12345678", "A Person", "123", "5555", true, true);
 		bank.setAvailableCreditLimit("12345678", new BigDecimal(1000.00));
 		creditLimitBefore = bank.getAvailableCreditLimit("12345678");
 		
 		cardRead.resetPaymentTotal();
-		
 		readSuccessful = false;
 	}
 	
@@ -63,9 +60,7 @@ public class TestCreditPayment {
 	@Test
 	public void TestCreditLimitAfterPurchase() {
 		BigDecimal payment = new BigDecimal(500.00);
-		
 		checkout.payWithDebitOrCredit(payment);
-		
 		//simulates someone retrying tap if read unsuccessful
 		while(!readSuccessful) {
 			try {
@@ -83,21 +78,16 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
-		
 		//checks bank credit limit
 		assertEquals(creditLimitBefore, bank.getAvailableCreditLimit("12345678").add(payment));
-		
 		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
-		
 	}
 	
 
 	@Test
 	public void TestWhenEnoughFundsToPayTap() {
 		BigDecimal payment = new BigDecimal(355.67);
-		
 		checkout.payWithDebitOrCredit(payment);
-		
 		//simulating a transaction with tap
 		
 		while(!readSuccessful) {
@@ -116,21 +106,15 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
-		
 		//checks cardReader controller payment total
 		assertEquals(payment, cardRead.getPaymentTotal());
-		
-		
 	}
 	
 	@Test
 	public void TestWhenEnoughFundsToPaySwipe() {
 		BigDecimal payment = new BigDecimal(789.32);
-		
 		checkout.payWithDebitOrCredit(payment);
-		
 		//simulating a transaction with swipe
-		
 		//if swipe does not read data, simulates customer trying again
 		while(!readSuccessful) {
 			try {
@@ -148,19 +132,16 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
-		
 		assertEquals(payment, cardRead.getPaymentTotal());
-		
 	}
+	
 	
 	@Test
 	public void TestWhenEnoughFundsToPayInsert() {
 		BigDecimal payment = new BigDecimal(100.00);
-		
 		checkout.payWithDebitOrCredit(payment);
 		
 		//simulating a transaction with tap
-		
 		while(!readSuccessful) {
 			try {
 				station.cardReader.insert(credit, "5555");
@@ -177,19 +158,16 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
-		
 		assertEquals(payment, cardRead.getPaymentTotal());
-		
 	}
+	
 	
 	@Test
 	public void TestCloseToCreditLimitBelow() {
 		BigDecimal payment = new BigDecimal(999.99);
-		
 		checkout.payWithDebitOrCredit(payment);
 		
 		//simulating a transaction with tap
-		
 		while(!readSuccessful) {
 			try {
 				station.cardReader.tap(credit);
@@ -206,21 +184,17 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
-		
 		//checks cardReader controller payment total
 		assertEquals(payment, cardRead.getPaymentTotal());
-		
-		
 	}
+	
 	
 	@Test
 	public void TestCloseToCreditLimitAbove() {
 		BigDecimal payment = new BigDecimal(1000.01);
-		
 		checkout.payWithDebitOrCredit(payment);
 		
 		//simulating a transaction with tap
-		
 		while(!readSuccessful) {
 			try {
 				station.cardReader.tap(credit);
@@ -237,21 +211,16 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
-		
 		//checks cardReader controller payment total
 		assertEquals(new BigDecimal(0), cardRead.getPaymentTotal());
-		
 	}
 	
 	
 	@Test
 	public void TestWhenNotEnoughFunds() {
 		BigDecimal payment = new BigDecimal(1500.00);
-		
 		checkout.payWithDebitOrCredit(payment);
-		
-		//simulating a transaction with tap
-		
+				
 		while(!readSuccessful) {
 			try {
 				station.cardReader.tap(credit);
@@ -268,18 +237,14 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
-		
 		assertEquals(new BigDecimal(0), cardRead.getPaymentTotal());
-			
 	}
+	
 	
 	@Test
 	public void TestWhenCustomerRemovesCardAfterPayment() {
 		BigDecimal payment = new BigDecimal(50.00);
-		
 		checkout.payWithDebitOrCredit(payment);
-		
-		
 		
 		while(!readSuccessful) {
 			try {
@@ -297,17 +262,14 @@ public class TestCreditPayment {
 		}
 		
 		station.cardReader.remove();
-		
-		assertFalse(station.cardReader.isDisabled());
-			
+		assertFalse(station.cardReader.isDisabled());	
 	}
+	
 	
 	@Test
 	public void TestWhenCustomerDoesNotRemoveCardAfterPayment() {
 		BigDecimal payment = new BigDecimal(50.00);
-		
 		checkout.payWithDebitOrCredit(payment);
-		
 		
 		while(!readSuccessful) {
 			try {
@@ -325,11 +287,8 @@ public class TestCreditPayment {
 		}
 		
 		assertTrue(station.cardReader.isDisabled());
-		
 		station.cardReader.remove();
-	
 	}
-
 	
 	
 }
