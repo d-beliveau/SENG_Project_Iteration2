@@ -41,10 +41,7 @@ public class CardFromCardReader implements CardReaderObserver{
 		return paymentTotal;
 	}
 	
-	public BigDecimal getPaymentAmount() {
-		return paymentAmount;
-	}
-	
+
 	public void resetPaymentTotal() {
 		paymentTotal = new BigDecimal("0");
 	}
