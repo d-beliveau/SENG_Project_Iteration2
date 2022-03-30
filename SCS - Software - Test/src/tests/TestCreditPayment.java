@@ -1,6 +1,8 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -10,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.lsmr.selfcheckout.Card;
 import org.lsmr.selfcheckout.ChipFailureException;
+import org.lsmr.selfcheckout.MagneticStripeFailureException;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 
 import controller.BankStub;
@@ -21,20 +24,25 @@ public class TestCreditPayment {
 	CardFromCardReader cardRead;
 	Card credit;
 	BigDecimal creditLimitBefore;
-	BankStub bank = new BankStub();
+	BankStub bank;
 	
 	Currency currency = Currency.getInstance("CAD");
 	int[] banknoteDenominations = {1, 2, 5, 10};
 	BigDecimal[] coinDenominations = {BigDecimal.TEN};
 	
+
+	
 	SelfCheckoutStation station = new SelfCheckoutStation(currency, banknoteDenominations, coinDenominations, 10, 2);
-	CustomerCheckout checkout = new CustomerCheckout(station);
+	CustomerCheckout checkout;
 	
 	boolean readSuccessful;
 	
 	@Before
 	public void setUp() {
-		cardRead = new CardFromCardReader(station);
+		bank = new BankStub();
+		checkout = new CustomerCheckout(station, bank);
+		
+		cardRead = checkout.getCardLogic();
 		
 		station.cardReader.attach(cardRead);
 		station.cardReader.enable();
@@ -49,6 +57,8 @@ public class TestCreditPayment {
 		readSuccessful = false;
 	}
 	
+	
+
 	//checking available credit limit after payment
 	@Test
 	public void TestCreditLimitAfterPurchase() {
@@ -56,18 +66,24 @@ public class TestCreditPayment {
 		
 		checkout.payWithDebitOrCredit(payment);
 		
+		//simulates someone retrying tap if read unsuccessful
 		while(!readSuccessful) {
 			try {
 				station.cardReader.tap(credit);
+				readSuccessful = true;
 			} catch (IOException e) {
 				if(e instanceof ChipFailureException) {
-					
+					continue;
 				}
 				else {
 					e.printStackTrace();
+					break;
 				}
 			}
 		}
+		
+		station.cardReader.remove();
+		
 		//checks bank credit limit
 		assertEquals(creditLimitBefore, bank.getAvailableCreditLimit("12345678").add(payment));
 		
@@ -84,16 +100,26 @@ public class TestCreditPayment {
 		
 		//simulating a transaction with tap
 		
-		try {
-			station.cardReader.tap(credit);
-		} catch (IOException e) {
-			e.printStackTrace();
+		while(!readSuccessful) {
+			try {
+				station.cardReader.tap(credit);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
 		}
+		
+		station.cardReader.remove();
 		
 		//checks cardReader controller payment total
 		assertEquals(payment, cardRead.getPaymentTotal());
 		
-		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
 		
 	}
 	
@@ -105,19 +131,29 @@ public class TestCreditPayment {
 		
 		//simulating a transaction with swipe
 		
-		try {
-			station.cardReader.swipe(credit);
-		} catch (IOException e) {
-			e.printStackTrace();
+		//if swipe does not read data, simulates customer trying again
+		while(!readSuccessful) {
+			try {
+				station.cardReader.swipe(credit);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof MagneticStripeFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
 		}
+		
+		station.cardReader.remove();
 		
 		assertEquals(payment, cardRead.getPaymentTotal());
 		
-		
-		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
-		
 	}
 	
+	@Test
 	public void TestWhenEnoughFundsToPayInsert() {
 		BigDecimal payment = new BigDecimal(100.00);
 		
@@ -125,18 +161,87 @@ public class TestCreditPayment {
 		
 		//simulating a transaction with tap
 		
-		try {
-			station.cardReader.insert(credit, "5555");
-		} catch (IOException e) {
-			e.printStackTrace();
+		while(!readSuccessful) {
+			try {
+				station.cardReader.insert(credit, "5555");
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
 		}
+		
+		station.cardReader.remove();
 		
 		assertEquals(payment, cardRead.getPaymentTotal());
 		
-		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
+	}
+	
+	@Test
+	public void TestCloseToCreditLimitBelow() {
+		BigDecimal payment = new BigDecimal(999.99);
+		
+		checkout.payWithDebitOrCredit(payment);
+		
+		//simulating a transaction with tap
+		
+		while(!readSuccessful) {
+			try {
+				station.cardReader.tap(credit);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
+		station.cardReader.remove();
+		
+		//checks cardReader controller payment total
+		assertEquals(payment, cardRead.getPaymentTotal());
+		
 		
 	}
 	
+	@Test
+	public void TestCloseToCreditLimitAbove() {
+		BigDecimal payment = new BigDecimal(1000.01);
+		
+		checkout.payWithDebitOrCredit(payment);
+		
+		//simulating a transaction with tap
+		
+		while(!readSuccessful) {
+			try {
+				station.cardReader.tap(credit);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
+		station.cardReader.remove();
+		
+		//checks cardReader controller payment total
+		assertEquals(new BigDecimal(0), cardRead.getPaymentTotal());
+		
+	}
 	
 	
 	@Test
@@ -147,25 +252,84 @@ public class TestCreditPayment {
 		
 		//simulating a transaction with tap
 		
-		try {
-			station.cardReader.insert(credit, "5555");
-		} catch (IOException e) {
-			e.printStackTrace();
+		while(!readSuccessful) {
+			try {
+				station.cardReader.tap(credit);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
 		}
 		
+		station.cardReader.remove();
+		
 		assertEquals(new BigDecimal(0), cardRead.getPaymentTotal());
-		
-		
+			
 	}
 	
 	@Test
-	public void TestWhenDataNotRead() {
+	public void TestWhenCustomerRemovesCardAfterPayment() {
+		BigDecimal payment = new BigDecimal(50.00);
 		
+		checkout.payWithDebitOrCredit(payment);
+		
+		
+		
+		while(!readSuccessful) {
+			try {
+				station.cardReader.insert(credit, "5555");
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
+		station.cardReader.remove();
+		
+		assertFalse(station.cardReader.isDisabled());
+			
 	}
 	
 	@Test
-	public void TestWhenDataRead() {
+	public void TestWhenCustomerDoesNotRemoveCardAfterPayment() {
+		BigDecimal payment = new BigDecimal(50.00);
 		
+		checkout.payWithDebitOrCredit(payment);
+		
+		
+		while(!readSuccessful) {
+			try {
+				station.cardReader.insert(credit, "5555");
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
+		assertTrue(station.cardReader.isDisabled());
+		
+		station.cardReader.remove();
+	
 	}
 
+	
+	
 }

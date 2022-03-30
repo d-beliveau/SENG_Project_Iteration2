@@ -41,10 +41,10 @@ public class CustomerCheckout{
 	private BigDecimal amountOwed = new BigDecimal(0);
 	ReceiptPrinter printer;
 	
-	public CustomerCheckout(SelfCheckoutStation station) {
+	public CustomerCheckout(SelfCheckoutStation station, BankStub bank) {
 		this.station = station;
 		cashLogic = new PayCash(station, new BigDecimal(0));
-		cardLogic = new CardFromCardReader(station);
+		cardLogic = new CardFromCardReader(station, bank);
 		printer = station.printer;
 	}
 	

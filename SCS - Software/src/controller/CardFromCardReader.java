@@ -48,6 +48,7 @@ public class CardFromCardReader implements CardReaderObserver{
 	public void resetPaymentTotal() {
 		paymentTotal = new BigDecimal("0");
 	}
+	
 
 	//DEBIT CARD METHOD
 	public boolean payWithDebit(CardData cardData) {
@@ -89,11 +90,9 @@ public class CardFromCardReader implements CardReaderObserver{
 	
 	//checks to see if an inserted card has been removed after payment
 	public void checkCardRemoved() {
-		while(cardInserted == true) {
+		if (cardInserted == true) {
 			station.cardReader.disable();
 		}
-		
-		station.cardReader.enable();
 		
 	}
 	
@@ -157,6 +156,7 @@ public class CardFromCardReader implements CardReaderObserver{
 	@Override
 	public void cardRemoved(CardReader reader) {
 		cardInserted = false;
+		station.cardReader.enable();
 	}
 
 	@Override

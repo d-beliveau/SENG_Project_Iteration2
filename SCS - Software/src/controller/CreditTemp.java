@@ -49,13 +49,13 @@ public class CreditTemp implements CardReaderObserver{
 		BigDecimal funds = null;
 		
 		String cardNum = cardData.getNumber();
-		if(bank.getAvailableCreditFunds(cardNum).compareTo(payment) < 0) {
+		if(bank.getAvailableCreditLimit(cardNum).compareTo(payment) < 0) {
 			paymentSuccessful = false;
 		}
-		if(bank.getAvailableCreditFunds(cardNum).compareTo(payment) >= 0){
+		if(bank.getAvailableCreditLimit(cardNum).compareTo(payment) >= 0){
 			paymentSuccessful = true;
-			funds = bank.getAvailableCreditFunds(cardNum).subtract(payment);
-			bank.setAvailableCreditFunds(cardNum, funds);
+			funds = bank.getAvailableCreditLimit(cardNum).subtract(payment);
+			bank.setAvailableCreditLimit(cardNum, funds);
 		}
 		
 		reset();
