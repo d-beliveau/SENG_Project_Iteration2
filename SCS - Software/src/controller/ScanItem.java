@@ -27,6 +27,7 @@ import org.lsmr.selfcheckout.Card.CardData;
 import org.lsmr.selfcheckout.devices.AbstractDevice;
 import org.lsmr.selfcheckout.devices.BarcodeScanner;
 import org.lsmr.selfcheckout.devices.CardReader;
+import org.lsmr.selfcheckout.devices.OverloadException;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.SimulationException;
 import org.lsmr.selfcheckout.products.BarcodedProduct;
@@ -192,6 +193,7 @@ class MultithreadingDemo extends Thread {
 	
     public void run()
     {
+    	BaggingArea baggingArea = new BaggingArea(station);
     	
 		double duration =0;
 		LocalDateTime initialTime = LocalDateTime.now();
@@ -200,9 +202,14 @@ class MultithreadingDemo extends Thread {
 	
 		while(duration < 5) {
 			duration = ChronoUnit.SECONDS.between(initialTime, LocalDateTime.now());
-			//baggingArea.bagItemAfterScanning
+			try {
+				baggingArea.bagItemAfterScanning();
+			} catch (OverloadException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if(station.mainScanner.isDisabled() == false) { //if scanner is enabled
-				hasItemBeenBagged.set(true);;
+				hasItemBeenBagged.set(true);
 				break;
 			}
 		}
