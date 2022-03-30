@@ -25,8 +25,8 @@ public class CardFromCardReader implements CardReaderObserver{
 	private boolean success = false;
 	private BankStub bank = new BankStub();
 	
-	protected BigDecimal paymentAmount;
-	protected BigDecimal paymentTotal;
+	protected BigDecimal paymentAmount = new BigDecimal("0");
+	protected BigDecimal paymentTotal = new BigDecimal("0");
 	protected String memberNumber;
 	
 	public CardFromCardReader(SelfCheckoutStation station) {
@@ -80,7 +80,7 @@ public class CardFromCardReader implements CardReaderObserver{
 
 	//MEMBERSHIP CARD METHOD
 	public void membershipCard(CardData cardData) {
-		System.out.println(memberNumber);
+		memberNumber = cardData.getNumber();
 	}
 	
 
@@ -112,7 +112,7 @@ public class CardFromCardReader implements CardReaderObserver{
 		}
 		
 		if (success == true) {
-			paymentTotal.add(paymentAmount);
+			paymentTotal = paymentTotal.add(paymentAmount);
 		}
 		reset();
 	}
