@@ -54,7 +54,6 @@ public class ScanItem implements BarcodeScannerObserver{
 	private BigDecimal billprice;
 	private BigDecimal productprice;
 	private BarcodedProduct p;
-	private AtomicBoolean hasItemBeenBagged = new AtomicBoolean();
 	private double expectedWeight = 0.0;
 	
 	
@@ -65,7 +64,6 @@ public class ScanItem implements BarcodeScannerObserver{
 	public ScanItem(SelfCheckoutStation station) {
 		this.station = station;
 		station.mainScanner.attach(this);
-		hasItemBeenBagged.set(false);
 	}
 	
 	//Construct scanner observer from checkout station
@@ -85,6 +83,10 @@ public class ScanItem implements BarcodeScannerObserver{
 		}
 		
 		
+	}
+	
+	public double getExpectedWeight() {
+		return expectedWeight;
 	}
 	
 	public void setItemWeightMap(Dictionary<Barcode, Double> itemWeightMap) {
@@ -167,11 +169,7 @@ public class ScanItem implements BarcodeScannerObserver{
 		}
 		
 	}
-	
-	public boolean getHasItemBeenBagged() {
-		return hasItemBeenBagged.get();
-	}
-	
+
 	
 	
 	//BillPrice Getter
