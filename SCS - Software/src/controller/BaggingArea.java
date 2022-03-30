@@ -161,14 +161,14 @@ public class BaggingArea implements ElectronicScaleObserver{
 		   try
 		   {
 			   itemTooLight = false;
-			   placeItem(itemsToBeBagged.get(0));
+			   placeItem(itemsToBeBagged.get(-1));
 			   if((currentWeight == previousWeight) && (itemsToBeBagged.get(0).getWeight() != 0))
 				   // itemWeight < sensitivity
 			   {
 				   itemTooLight = true;
 			   }
 			   // checks if this item is actually placed else throw exception
-			   checkIfItemPlaced(itemsToBeBagged.get(0));
+			   checkIfItemPlaced(itemsToBeBagged.get(-1));
 			   // checkIfItemPlaced(Item anItem) also enables the scanner ,
 			   
 			   
@@ -176,7 +176,7 @@ public class BaggingArea implements ElectronicScaleObserver{
 			   // and add it here
 			   
 			   
-			   itemsToBeBagged.remove(0); // removing item after bagging
+			   itemsToBeBagged.remove(-1); // removing item after bagging
 			   
 			   // throw exception if item weight < sensitivity or item == null
 		   }
