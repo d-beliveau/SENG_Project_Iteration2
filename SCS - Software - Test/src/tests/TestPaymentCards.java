@@ -248,6 +248,7 @@ public class TestPaymentCards {
 		station.banknoteInput.accept(banknote20);
 		station.banknoteInput.accept(banknote20);
 		assertTrue(checkoutTest.confirmPurchase());
+	
 	}
 
 	/*
