@@ -106,6 +106,7 @@ public class TestCreditPayment {
 		
 	}
 	
+	@Test
 	public void TestWhenEnoughFundsToPayInsert() {
 		BigDecimal payment = new BigDecimal(100.00);
 		

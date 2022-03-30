@@ -13,6 +13,7 @@ import org.lsmr.selfcheckout.devices.*;
 import controller.*;
 public class TestDebitPayment {
 	
+	private BigDecimal previousFunds;
 	private CustomerCheckout checkoutTest;
     private SelfCheckoutStation station;
     private Card debitCard = new Card("Debit", "12345678", "tester", "123", "1234", true, true);
@@ -31,6 +32,7 @@ public class TestDebitPayment {
 	     bank.setAvailableCreditLimit("87654321", new BigDecimal(100));
 	     bank.setAvailableDebitFunds("12345678", new BigDecimal(100));
 	     checkoutTest.getCardLogic().setBank(bank);
+	     previousFunds = bank.getAvailableDebitFunds("12345678");
 	}
 	
 	 @Test
@@ -51,6 +53,27 @@ public class TestDebitPayment {
 		 station.cardReader.tap(debitCard);
 
 		 assertFalse(checkoutTest.confirmPurchase());
+	 }
+	 
+	 @Test
+	 public void fundsAfterPurchase() {
+		 BigDecimal payment = new BigDecimal(50.00);
+		 checkoutTest.payWithDebitOrCredit(payment);
+			
+		 try {
+			 station.cardReader.tap(debitCard);
+		 } catch (IOException e) {
+			 e.printStackTrace();
+		 }
+	
+		 BigDecimal newFunds = previousFunds.subtract(payment);
+		 
+		 assertEquals(newFunds,bank.getAvailableDebitFunds("12345678"));
+	 }
+	 
+	 @After
+	 public void after() {
+		 BigDecimal newFunds = bank.getAvailableDebitFunds("12345678");
 	 }
 
 }
