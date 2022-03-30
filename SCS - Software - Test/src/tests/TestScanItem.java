@@ -24,6 +24,7 @@ package tests;
 import org.lsmr.selfcheckout.Banknote;
 import org.lsmr.selfcheckout.Barcode;
 import org.lsmr.selfcheckout.BarcodedItem;
+import org.lsmr.selfcheckout.Coin;
 import org.lsmr.selfcheckout.Numeral;
 import org.lsmr.selfcheckout.devices.DisabledException;
 import org.lsmr.selfcheckout.devices.OverloadException;
@@ -88,8 +89,8 @@ public class TestScanItem {
         this.doritoItem = new BarcodedItem(doritoBar, 50);
 
         //Set-up products
-        this.soupProd = new BarcodedProduct(soupBar,"Soup",soupPrice, 0);
-        this.doritoProd = new BarcodedProduct(doritoBar,"Soup",doritoPrice, 0);
+        this.soupProd = new BarcodedProduct(soupBar,"Soup",soupPrice, 50);
+        this.doritoProd = new BarcodedProduct(doritoBar,"Soup",doritoPrice, 50);
     }
 
     //BASIC FUNCTIONALITY TESTING
@@ -304,6 +305,10 @@ public class TestScanItem {
     //Test for scanning more item after partial payment
     @Test
     public void testPartialPayment() throws DisabledException, OverloadException {
+    	
+    	this.software.addProduct(doritoProd);
+    	this.software.addProduct(soupProd);
+    	
     	//Add soup item
     	do 
     	{
@@ -311,36 +316,37 @@ public class TestScanItem {
     	}
     	while(this.Status == false);
     	
-    	//The soup cost $50
-    	PayCash payCash = new PayCash(station, software.GetBillPrice(new BigDecimal(0)));
+    	//The soup cost $3
+    	PayCash payCash = new PayCash(station, this.software.GetBillPrice(new BigDecimal(0)) );
     	
-    	//Lets make a partial payment of $20. We still have $30 payment left
-    	Banknote partialPayment = new Banknote( Currency.getInstance("CAD") , 20);
-    	station.banknoteInput.accept(partialPayment);
+    	//Lets make a partial payment of $1. We still have $2 payment left
+    	BigDecimal partialPayment = new BigDecimal(1);
+    	Coin partialPaymentCoin = new Coin( Currency.getInstance("CAD") ,partialPayment);
+    	station.coinSlot.accept(partialPaymentCoin);
+    	payCash.setAmountOwed(new BigDecimal(2));
+    	
+   
+    	assertEquals(payCash.getAmountOwed(), new BigDecimal(2));
     	
     	
-    	//Add dorito item. The dorito item cost $50
-    	//Now we have to make a payment of $80
+    	//Scan dorito item after partial payment. The dorito item cost $2
+    	//Now we have to make a payment of $4
     	do 
     	{
     		Status = this.software.scanAnItem(doritoItem);
     	}
     	while(this.Status == false);
-    	
+
     	
     	//The scanner controller will recalculate how much you have not pay now 
     	//And send that value to the payCash controller
-    	payCash.setTotalPayment(software.GetBillPrice( new BigDecimal(20)));
+    	payCash.setAmountOwed(software.GetBillPrice(partialPayment));
+    	System.out.println(payCash.getAmountOwed());
     	
-    	
-    	//Lets make the full payment of all item with a $100 bill
-    	Banknote fullPayment = new Banknote( Currency.getInstance("CAD") , 100);
-    	//software.getBillPrice;
-  
-    	station.banknoteInput.accept(fullPayment);
-    	
-    	//assertEqual();
-    	
+    	//Even after partial payment and scanning a new item
+    	//Money owed should be $4 for both payCash and scan Item controller
+    	assertEquals(payCash.getAmountOwed(),new BigDecimal(4));
+    	assertEquals(software.GetBillPrice(partialPayment), new BigDecimal(4));
     }
     
 }
