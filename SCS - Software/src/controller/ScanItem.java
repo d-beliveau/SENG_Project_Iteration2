@@ -69,9 +69,10 @@ public class ScanItem implements BarcodeScannerObserver{
 	//Construct scanner observer from checkout station
 	public boolean scanAnItem(BarcodedItem item) {
 		
+		Scanneditems.add(item);
 		station.mainScanner.scan(item);
 		if (this.scanResult() == true) {
-			Scanneditems.add(item);
+			
 			
 			//!!! COMMENTED THIS LINE OUT FOR TESTING !!!
 			//scanBaggingItem(item);
@@ -79,6 +80,7 @@ public class ScanItem implements BarcodeScannerObserver{
 			return true;
 			
 		} else {
+			Scanneditems.remove(item);
 			return false;
 		}
 		
