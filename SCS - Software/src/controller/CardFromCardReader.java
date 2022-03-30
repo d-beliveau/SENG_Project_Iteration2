@@ -106,11 +106,6 @@ public class CardFromCardReader implements CardReaderObserver{
 		memberNumber = cardData.getNumber();
 	}
 	
-
-	public BankStub getBank() {
-		return bank;
-	}
-
 	public void setBank(BankStub bank) {
 		this.bank = bank;
 	}

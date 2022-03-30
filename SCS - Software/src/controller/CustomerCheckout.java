@@ -23,12 +23,9 @@ package controller;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Dictionary;
-import java.util.List;
 
 import org.lsmr.selfcheckout.Barcode;
 import org.lsmr.selfcheckout.BarcodedItem;
-import org.lsmr.selfcheckout.Item;
 import org.lsmr.selfcheckout.devices.*;
 import org.lsmr.selfcheckout.products.*;
 
@@ -108,36 +105,23 @@ public class CustomerCheckout{
 	     //Return false if customer has not paid for everything
 	     if( res == 1 ) {
 	         return false;
-	     }
+	     }  
 	     
-	 	// * Code from Iteration 1 - Group 48
-	 	
-	     // Going through list of items the cumstomer has scanned
-	 	for(BarcodedItem item : this.scan.Scanneditems) {
-	 		// Get the barcode of the n-th item
-	 		Barcode tempBarcode = item.getBarcode();
-	 		// For that barcode, get the prodect assosciated with it in Dictionary (Products)
-	 		BarcodedProduct product = this.scan.Products.get(tempBarcode);
-	 		
-	 		//
-	 		String toPrint = "$" + product.getPrice().setScale(2, RoundingMode.HALF_EVEN) + "\n";
-	 		for(char c : toPrint.toCharArray()) {
-	 			printer.print(c);
-	 		}
-	 	}
-	 	
-	 	String endString = "Total:\n" + "$" + this.scan.GetBillPrice().setScale(2, RoundingMode.HALF_EVEN);
-	 	for(char c : endString.toCharArray()) {
-	 		printer.print(c);
-	 	}
-	 	
-	    if(cardLogic.memberNumber != null) {
-		 	for(char c :cardLogic.memberNumber.toCharArray()) {
-		 		printer.print(c);
-		 	}
-	    }
-	 	printer.cutPaper();
-	
+	     try {
+	    	 if (scan.Scanneditems != null) {
+		    	 printReceiptItems();
+		     }
+	     }
+	     catch(NullPointerException e) {}
+	    //Prints member number
+		if(cardLogic.memberNumber != null) {
+			String memberPrint = "Member number: " + cardLogic.memberNumber;
+			for(char c : memberPrint.toCharArray()) {
+			 		printer.print(c);
+			}
+		}
+		printer.cutPaper();
+	     
 		station.mainScanner.disable();
 		station.coinSlot.disable();
 		station.banknoteInput.disable();
@@ -146,6 +130,36 @@ public class CustomerCheckout{
 		//Returns true if everything is paid for
 		return true;
 		
+	}
+	
+	public void printReceiptItems() {
+		 // Going through list of items the cumstomer has scanned
+	 	for(BarcodedItem item : this.scan.Scanneditems) {
+	 		// Get the barcode of the n-th item
+	 		Barcode tempBarcode = item.getBarcode();
+	 		// For that barcode, get the product associated with it in Dictionary (Products)
+	 		BarcodedProduct product = this.scan.Products.get(tempBarcode);
+	 		
+	 		// Prints the price
+	 		String toPrintPrice = "$" + product.getPrice().setScale(2, RoundingMode.HALF_EVEN) + "\n";
+	 		for(char c : toPrintPrice.toCharArray()) {
+	 			printer.print(c);
+	 		}
+	 		
+	 		// Prints the product
+	 		String toPrintProduct = product.getDescription();
+	 		for(char c : toPrintProduct.toCharArray()) {
+	 			printer.print(c);
+	 		}
+	 		printer.print('\n');
+	 	}
+	 	
+	 	// Prints total
+	 	String endString = "Total: " + "$" + this.scan.GetBillPrice().setScale(2, RoundingMode.HALF_EVEN);
+	 	for(char c : endString.toCharArray()) {
+	 		printer.print(c);
+	 	}
+	 	printer.print('\n');
 	}
 	
 	//Customer wishes to add more items even after partial payment

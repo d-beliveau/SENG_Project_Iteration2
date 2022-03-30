@@ -56,8 +56,11 @@ public class TestPaymentCards {
 	 */
 	@Test
 	public void memberReceipt() throws IOException{
+		station.printer.addInk(100);
+		station.printer.addPaper(100);
 		checkoutTest.useMembershipCard();
 		station.cardReader.swipe(memberCard);
+		assertTrue(checkoutTest.confirmPurchase());
 	}
 
 	@Test
@@ -242,10 +245,40 @@ public class TestPaymentCards {
 	@Test
 	public void payMix() throws IOException, DisabledException, OverloadException {
 		checkoutTest.setAmountOwed(new BigDecimal(100));
+		
 		checkoutTest.payWithDebitOrCredit(new BigDecimal(30));
-		station.cardReader.swipe(debitCard);
+		while(!readSuccessful) {
+			try {
+				station.cardReader.swipe(debitCard);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}		
+		readSuccessful = false;
+		
 		checkoutTest.payWithDebitOrCredit(new BigDecimal(30));
-		station.cardReader.swipe(creditCard);
+		while(!readSuccessful) {
+			try {
+				station.cardReader.swipe(creditCard);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
 		checkoutTest.payWithBankNoteAndCoin(new BigDecimal(40));
 		station.banknoteInput.accept(banknote20);
 		station.banknoteInput.accept(banknote20);
@@ -261,13 +294,44 @@ public class TestPaymentCards {
 		bank.setAvailableDebitFunds("12345678", new BigDecimal(10));
 		checkoutTest.getCardLogic().setBank(bank);
 		checkoutTest.setAmountOwed(new BigDecimal(100));
+		
 		checkoutTest.payWithDebitOrCredit(new BigDecimal(30));
-		station.cardReader.swipe(debitCard);
+		while(!readSuccessful) {
+			try {
+				station.cardReader.swipe(debitCard);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}		
+		readSuccessful = false;
+		
 		checkoutTest.payWithDebitOrCredit(new BigDecimal(30));
-		station.cardReader.swipe(creditCard);
+		while(!readSuccessful) {
+			try {
+				station.cardReader.swipe(creditCard);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
 		checkoutTest.payWithBankNoteAndCoin(new BigDecimal(40));
 		station.banknoteInput.accept(banknote20);
 		station.banknoteInput.accept(banknote20);
+		
 		assertFalse(checkoutTest.confirmPurchase());
 
 	}
