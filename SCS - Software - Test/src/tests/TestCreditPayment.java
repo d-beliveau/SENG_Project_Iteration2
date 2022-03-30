@@ -69,7 +69,8 @@ public class TestCreditPayment {
 				readSuccessful = true;
 			} catch (IOException e) {
 				
-				if(e instanceof TapFailureException) {
+				//In the CardReader class, the tap method throws a ChipFailureException but in the Card class throws a TapFailureException
+				if(e instanceof TapFailureException || e instanceof ChipFailureException) {
 					continue;
 				}
 				else { 
@@ -97,7 +98,7 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
-				if(e instanceof TapFailureException) {
+				if(e instanceof TapFailureException || e instanceof ChipFailureException) {
 					continue;
 				}
 				else {
@@ -175,7 +176,7 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
-				if(e instanceof TapFailureException) {
+				if(e instanceof TapFailureException || e instanceof ChipFailureException) {
 					continue;
 				}
 				else {
@@ -202,7 +203,7 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
-				if(e instanceof TapFailureException) {
+				if(e instanceof TapFailureException || e instanceof ChipFailureException) {
 					continue;
 				}
 				else {
@@ -228,7 +229,7 @@ public class TestCreditPayment {
 				station.cardReader.tap(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
-				if(e instanceof TapFailureException) {
+				if(e instanceof TapFailureException || e instanceof ChipFailureException) {
 					continue;
 				}
 				else {
