@@ -335,11 +335,11 @@ public class TestScanItem {
     	
     	//Lets make the full payment of all item with a $100 bill
     	Banknote fullPayment = new Banknote( Currency.getInstance("CAD") , 100);
-    	software.getBillPrice
+    	//software.getBillPrice;
   
     	station.banknoteInput.accept(fullPayment);
     	
-    	assertEqual();
+    	//assertEqual();
     	
     }
     
