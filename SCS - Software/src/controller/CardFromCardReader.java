@@ -25,15 +25,16 @@ public class CardFromCardReader implements CardReaderObserver{
 	
 	private boolean cardInserted = false;
 	private boolean success = false;
-	private BankStub bank = new BankStub();
-	
+	private BankStub bank;
 	protected BigDecimal paymentAmount = new BigDecimal("0");
 	protected BigDecimal paymentTotal = new BigDecimal("0");
 	protected String memberNumber;
 	
-	public CardFromCardReader(SelfCheckoutStation station) {
+	public CardFromCardReader(SelfCheckoutStation station, BankStub b) {
 		this.station = station;
 		station.cardReader.attach(this);
+		
+		bank = b;
 	}
 	
 	public BigDecimal getPaymentTotal() {
