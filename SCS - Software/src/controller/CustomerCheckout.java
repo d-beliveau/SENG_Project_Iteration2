@@ -22,7 +22,13 @@
 package controller;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Dictionary;
+import java.util.List;
 
+import org.lsmr.selfcheckout.Barcode;
+import org.lsmr.selfcheckout.BarcodedItem;
+import org.lsmr.selfcheckout.Item;
 import org.lsmr.selfcheckout.devices.*;
 import org.lsmr.selfcheckout.products.*;
 
@@ -39,6 +45,7 @@ public class CustomerCheckout{
 	private CardFromCardReader cardLogic;
 	private PayCash cashLogic;
 	private BigDecimal amountOwed = new BigDecimal(0);
+	private ScanItem scan;
 	ReceiptPrinter printer;
 	
 	public CustomerCheckout(SelfCheckoutStation station, BankStub bank) {
@@ -102,22 +109,28 @@ public class CustomerCheckout{
 	     if( res == 1 ) {
 	         return false;
 	     }
+	     
+	 	// * Code from Iteration 1 - Group 48
 	 	
-	 	/*
-	 	 * Code from Iteration 1 - Group 48
-	 	
-	 	for(Product product : products) {
+	     // Going through list of items the cumstomer has scanned
+	 	for(BarcodedItem item : this.scan.Scanneditems) {
+	 		// Get the barcode of the n-th item
+	 		Barcode tempBarcode = item.getBarcode();
+	 		// For that barcode, get the prodect assosciated with it in Dictionary (Products)
+	 		BarcodedProduct product = this.scan.Products.get(tempBarcode);
+	 		
+	 		//
 	 		String toPrint = "$" + product.getPrice().setScale(2, RoundingMode.HALF_EVEN) + "\n";
 	 		for(char c : toPrint.toCharArray()) {
 	 			printer.print(c);
 	 		}
 	 	}
 	 	
-	 	String endString = "Total:\n" + "$" + new BigDecimal(totalCost).setScale(2, RoundingMode.HALF_EVEN);
+	 	String endString = "Total:\n" + "$" + this.scan.GetBillPrice().setScale(2, RoundingMode.HALF_EVEN);
 	 	for(char c : endString.toCharArray()) {
 	 		printer.print(c);
 	 	}
-	 	*/
+	 	
 	    if(cardLogic.memberNumber != null) {
 		 	for(char c :cardLogic.memberNumber.toCharArray()) {
 		 		printer.print(c);

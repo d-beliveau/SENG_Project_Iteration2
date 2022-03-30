@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.SimulationException;
 
+import controller.BankStub;
 import controller.CustomerCheckout;
 
 import java.math.BigDecimal;
@@ -43,6 +44,9 @@ public class TestCustomerCheckout {
         int[] ints = {5, 10, 20, 50};
         BigDecimal[] decs = {new BigDecimal(".05"), new BigDecimal(".1"), new BigDecimal(".25")};
         station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
+        BankStub stub = new BankStub();
+        checkoutTest = new CustomerCheckout(station, stub);
+        
     }
     
     @Test
@@ -69,5 +73,11 @@ public class TestCustomerCheckout {
     public void testFailCheckout() {
         station.coinSlot.forceErrorPhase();
         checkoutTest = new CustomerCheckout(station);
+    }
+    
+    
+    @Test
+    public void testConfirmPurchase() {
+    	
     }
 }

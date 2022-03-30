@@ -39,8 +39,8 @@ import org.lsmr.selfcheckout.devices.observers.BarcodeScannerObserver;
 // Controller class for 'customer scans item' use case
 public class ScanItem implements BarcodeScannerObserver{
 
-	private Dictionary<Barcode, BarcodedProduct> Products = new Hashtable<Barcode, BarcodedProduct>();
-	private	List <BarcodedItem> Scanneditems = new ArrayList<BarcodedItem>();
+	Dictionary<Barcode, BarcodedProduct> Products = new Hashtable<Barcode, BarcodedProduct>();
+	protected List <BarcodedItem> Scanneditems = new ArrayList<BarcodedItem>();
 
 	//Key variables
 	private BigDecimal billprice;
