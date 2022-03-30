@@ -27,26 +27,31 @@ import controller.*;
 
 public class TestDebitPayment {
 	
+	private CardFromCardReader cardRead;
 	private BigDecimal previousFunds;
 	private CustomerCheckout checkoutTest;
     private SelfCheckoutStation station;
-    private Card debitCard = new Card("Debit", "12345678", "tester", "123", "1234", true, true);
+    private Card debitCard = new Card("Debit", "12345678", "tester", "123", "2222", true, true);
     private Card creditCard = new Card("Credit", "87654321", "tester", "123", "1234", true, true);
     private Card memberCard = new Card("Member", "55555555", "tester", "123", "1234", true, true);
     private Banknote banknote20 = new Banknote(Currency.getInstance("USD"), 20);
     private BankStub bank = new BankStub();
+    private boolean readSuccessful;
     
 	@Before
 	public void setUp() {
 		Currency currency = Currency.getInstance("USD");
-	     int[] ints = {5, 10, 20, 50};
-	     BigDecimal[] decs = {new BigDecimal(".05"), new BigDecimal(".1"), new BigDecimal(".25")};
-	     station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
-	     checkoutTest = new CustomerCheckout(station, bank);
-	     bank.setAvailableCreditLimit("87654321", new BigDecimal(100));
-	     bank.setAvailableDebitFunds("12345678", new BigDecimal(100));
-	     checkoutTest.getCardLogic().setBank(bank);
-	     previousFunds = bank.getAvailableDebitFunds("12345678");
+	    int[] ints = {5, 10, 20, 50};
+	    BigDecimal[] decs = {new BigDecimal(".05"), new BigDecimal(".1"), new BigDecimal(".25")};
+	    station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
+	    checkoutTest = new CustomerCheckout(station, bank);
+	    bank.setAvailableCreditLimit("87654321", new BigDecimal(100));
+	    bank.setAvailableDebitFunds("12345678", new BigDecimal(2500));
+	    checkoutTest.getCardLogic().setBank(bank);
+	    previousFunds = bank.getAvailableDebitFunds("12345678");
+		cardRead = checkoutTest.getCardLogic();
+		cardRead.resetPaymentTotal();
+		readSuccessful = false;
 	}
 	
 	 @Test
@@ -81,9 +86,83 @@ public class TestDebitPayment {
 		 }
 	
 		 BigDecimal newFunds = previousFunds.subtract(payment);
-		 
 		 assertEquals(newFunds,bank.getAvailableDebitFunds("12345678"));
 	 }
+	 
+	@Test
+	public void TestWhenEnoughFundsToPaySwipeDebit() {
+		BigDecimal payment = new BigDecimal(789.32);
+		checkoutTest.payWithDebitOrCredit(payment);
+		//simulating a transaction with swipe
+		//if swipe does not read data, simulates customer trying again
+		while(!readSuccessful) {
+			try {
+				station.cardReader.swipe(debitCard);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof MagneticStripeFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+			
+		station.cardReader.remove();
+		assertEquals(payment, cardRead.getPaymentTotal());
+	}
+	
+	@Test
+	public void TestWhenEnoughFundsToPayTapDebit() {
+		BigDecimal payment = new BigDecimal(222.22);
+		checkoutTest.payWithDebitOrCredit(payment);
+		//simulating a transaction with swipe
+		//if swipe does not read data, simulates customer trying again
+		while(!readSuccessful) {
+			try {
+				station.cardReader.tap(debitCard);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof MagneticStripeFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
+		station.cardReader.remove();
+		assertEquals(payment, cardRead.getPaymentTotal());
+	}
+	
+	@Test
+	public void TestWhenEnoughFundsToPayInsertDebit() {
+		BigDecimal payment = new BigDecimal(100.00);
+		checkoutTest.payWithDebitOrCredit(payment);
+		
+		//simulating a transaction with tap
+		while(!readSuccessful) {
+			try {
+				station.cardReader.insert(debitCard, "2222");
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
+		station.cardReader.remove();
+		assertEquals(payment, cardRead.getPaymentTotal());
+	}
 	 
 	 @After
 	 public void after() {

@@ -25,16 +25,11 @@ public class TestCreditPayment {
 	Card credit;
 	BigDecimal creditLimitBefore;
 	BankStub bank;
-	
 	Currency currency = Currency.getInstance("CAD");
 	int[] banknoteDenominations = {1, 2, 5, 10};
 	BigDecimal[] coinDenominations = {BigDecimal.TEN};
-	
-
-	
 	SelfCheckoutStation station = new SelfCheckoutStation(currency, banknoteDenominations, coinDenominations, 10, 2);
 	CustomerCheckout checkout;
-	
 	boolean readSuccessful;
 	
 	@Before
@@ -86,7 +81,7 @@ public class TestCreditPayment {
 	
 
 	@Test
-	public void TestWhenEnoughFundsToPayTap() {
+	public void TestWhenEnoughFundsToPayTapCredit() {
 		BigDecimal payment = new BigDecimal(355.67);
 		checkout.payWithDebitOrCredit(payment);
 		//simulating a transaction with tap
@@ -112,7 +107,7 @@ public class TestCreditPayment {
 	}
 	
 	@Test
-	public void TestWhenEnoughFundsToPaySwipe() {
+	public void TestWhenEnoughFundsToPaySwipeCredit() {
 		BigDecimal payment = new BigDecimal(789.32);
 		checkout.payWithDebitOrCredit(payment);
 		//simulating a transaction with swipe
@@ -138,7 +133,7 @@ public class TestCreditPayment {
 	
 	
 	@Test
-	public void TestWhenEnoughFundsToPayInsert() {
+	public void TestWhenEnoughFundsToPayInsertCredit() {
 		BigDecimal payment = new BigDecimal(100.00);
 		checkout.payWithDebitOrCredit(payment);
 		
@@ -198,7 +193,7 @@ public class TestCreditPayment {
 		//simulating a transaction with tap
 		while(!readSuccessful) {
 			try {
-				station.cardReader.tap(credit);
+				station.cardReader.swipe(credit);
 				readSuccessful = true;
 			} catch (IOException e) {
 				if(e instanceof ChipFailureException) {
@@ -218,13 +213,13 @@ public class TestCreditPayment {
 	
 	
 	@Test
-	public void TestWhenNotEnoughFunds() {
+	public void TestWhenSurpassedLimit() {
 		BigDecimal payment = new BigDecimal(1500.00);
 		checkout.payWithDebitOrCredit(payment);
 				
 		while(!readSuccessful) {
 			try {
-				station.cardReader.tap(credit);
+				station.cardReader.insert(credit, "5555");
 				readSuccessful = true;
 			} catch (IOException e) {
 				if(e instanceof ChipFailureException) {
@@ -290,6 +285,5 @@ public class TestCreditPayment {
 		assertTrue(station.cardReader.isDisabled());
 		station.cardReader.remove();
 	}
-	
 	
 }
