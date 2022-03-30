@@ -9,6 +9,7 @@ import java.util.Currency;
 import org.junit.Before;
 import org.junit.Test;
 import org.lsmr.selfcheckout.Card;
+import org.lsmr.selfcheckout.ChipFailureException;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 
 import controller.BankStub;
@@ -29,6 +30,7 @@ public class TestCreditPayment {
 	SelfCheckoutStation station = new SelfCheckoutStation(currency, banknoteDenominations, coinDenominations, 10, 2);
 	CustomerCheckout checkout = new CustomerCheckout(station);
 	
+	boolean readSuccessful;
 	
 	@Before
 	public void setUp() {
@@ -43,6 +45,8 @@ public class TestCreditPayment {
 		creditLimitBefore = bank.getAvailableCreditLimit("12345678");
 		
 		cardRead.resetPaymentTotal();
+		
+		readSuccessful = false;
 	}
 	
 	//checking available credit limit after payment
@@ -52,12 +56,19 @@ public class TestCreditPayment {
 		
 		checkout.payWithDebitOrCredit(payment);
 		
-		try {
-			station.cardReader.tap(credit);
-		} catch (IOException e) {
-			e.printStackTrace();
+		while(!readSuccessful) {
+			try {
+				station.cardReader.tap(credit);
+			} catch (IOException e) {
+				if(e instanceof ChipFailureException) {
+					
+				}
+				else {
+					e.printStackTrace();
+				}
+			}
 		}
-		
+		//checks bank credit limit
 		assertEquals(creditLimitBefore, bank.getAvailableCreditLimit("12345678").add(payment));
 		
 		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
@@ -79,6 +90,7 @@ public class TestCreditPayment {
 			e.printStackTrace();
 		}
 		
+		//checks cardReader controller payment total
 		assertEquals(payment, cardRead.getPaymentTotal());
 		
 		bank.setAvailableCreditLimit("12345678", creditLimitBefore);
@@ -129,6 +141,20 @@ public class TestCreditPayment {
 	
 	@Test
 	public void TestWhenNotEnoughFunds() {
+		BigDecimal payment = new BigDecimal(1500.00);
+		
+		checkout.payWithDebitOrCredit(payment);
+		
+		//simulating a transaction with tap
+		
+		try {
+			station.cardReader.insert(credit, "5555");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(new BigDecimal(0), cardRead.getPaymentTotal());
+		
 		
 	}
 	
