@@ -91,7 +91,7 @@ public class CustomerCheckout{
 	public boolean confirmPurchase() {
 		 int res;
 		 BigDecimal amountPayed = cashLogic.getTotalPayment().add(cardLogic.paymentTotal);
-	     res = amountOwed.compareTo(amountPayed);
+	     res = getAmountOwed().compareTo(amountPayed);
 
 	     //Return false if customer has not paid for everything
 	     if( res == 1 ) {
@@ -115,6 +115,16 @@ public class CustomerCheckout{
 		station.coinSlot.disable();
 		station.banknoteInput.disable();
 		station.cardReader.disable();
+	}
+
+
+	public BigDecimal getAmountOwed() {
+		return amountOwed;
+	}
+
+
+	public void setAmountOwed(BigDecimal amountOwed) {
+		this.amountOwed = amountOwed;
 	}
 	
 }
