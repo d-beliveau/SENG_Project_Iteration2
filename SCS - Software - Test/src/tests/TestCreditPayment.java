@@ -63,6 +63,27 @@ public class TestCreditPayment {
 	}
 	
 	@Test
+	public void TestWhenEnoughFundsToPaySwipe() {
+		BigDecimal payment = new BigDecimal(999.99);
+		
+		checkout.payWithDebitOrCredit(payment);
+		
+		//simulating a transaction with tap
+		
+		try {
+			station.cardReader.swipe(credit);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(payment, cardRead.getPaymentTotal());
+		
+		BigDecimal funds = bank.getAvailableCreditLimit("12345678");
+		bank.setAvailableCreditLimit(null, funds.add(payment));
+		
+	}
+	
+	@Test
 	public void TestWhenNotEnoughFunds() {
 		
 	}
