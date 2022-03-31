@@ -191,7 +191,7 @@ public class CustomerCheckout{
 	}
 	
 	public void setCardLogic(CardFromCardReader someCard) {
-		cardLoginc = someCard;
+		cardLogic = someCard;
 	}
 
 
