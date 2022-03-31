@@ -86,7 +86,7 @@ public class CustomerCheckout{
 	}
 
 	//Customer choose to use debit or credit card for payment
-	public void payWithDebitOrCredit() {
+	public void payWithDebitOrCredit(BigDecimal payment) {
 		station.cardReader.enable();
 		
 		station.mainScanner.disable();
@@ -184,6 +184,14 @@ public class CustomerCheckout{
 	
 	public BigDecimal getTotalPayment() {
 		return totalPayment;
+	}
+	
+	public CardFromCardReader getCardLogic() {
+		return cardLogic;
+	}
+	
+	public void setCardLogic(CardFromCardReader someCard) {
+		cardLoginc = someCard;
 	}
 
 
