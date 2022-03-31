@@ -155,7 +155,7 @@ public class CustomerCheckout{
 	 	}
 	 	
 	 	// Prints total
-	 	String endString = "Total: " + "$" + this.scan.GetBillPrice().setScale(2, RoundingMode.HALF_EVEN);
+	 	String endString = "Total: " + "$" + this.scan.GetBillPrice(amountOwed).setScale(2, RoundingMode.HALF_EVEN);
 	 	for(char c : endString.toCharArray()) {
 	 		printer.print(c);
 	 	}

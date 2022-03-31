@@ -49,6 +49,9 @@ public class TestPaymentCards {
 		creditCardRead.resetPaymentTotal();
 
 		readSuccessful = false;
+		
+		station.banknoteInput.enable();
+		station.banknoteOutput.enable();
 	}
 
 	/*
@@ -59,7 +62,20 @@ public class TestPaymentCards {
 		station.printer.addInk(100);
 		station.printer.addPaper(100);
 		checkoutTest.useMembershipCard();
-		station.cardReader.swipe(memberCard);
+		while(!readSuccessful) {
+			try {
+				station.cardReader.swipe(memberCard);
+				readSuccessful = true;
+			} catch (IOException e) {
+				if(e instanceof MagneticStripeFailureException) {
+					continue;
+				}
+				else {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
 		assertTrue(checkoutTest.confirmPurchase());
 	}
 
@@ -244,7 +260,7 @@ public class TestPaymentCards {
 	 */
 	@Test
 	public void payMix() throws IOException, DisabledException, OverloadException {
-		checkoutTest.setAmountOwed(new BigDecimal(100));
+		checkoutTest.setAmountOwed(new BigDecimal(80));
 		
 		checkoutTest.payWithDebitOrCredit(new BigDecimal(30));
 		while(!readSuccessful) {
@@ -279,13 +295,13 @@ public class TestPaymentCards {
 			}
 		}
 		
-		checkoutTest.payWithBankNoteAndCoin(new BigDecimal(40));
+		checkoutTest.payWithBankNoteAndCoin(new BigDecimal(20));
 		station.banknoteInput.accept(banknote20);
-		station.banknoteInput.accept(banknote20);
+		//station.banknoteInput.accept(banknote20);
 		assertTrue(checkoutTest.confirmPurchase());
 	
 	}
-
+	
 	/*
 	 * Tests to see if the multi-method payment will fail if a payment method fails
 	 */
@@ -293,7 +309,7 @@ public class TestPaymentCards {
 	public void payMixFail() throws IOException, DisabledException, OverloadException {
 		bank.setAvailableDebitFunds("12345678", new BigDecimal(10));
 		checkoutTest.getCardLogic().setBank(bank);
-		checkoutTest.setAmountOwed(new BigDecimal(100));
+		checkoutTest.setAmountOwed(new BigDecimal(80));
 		
 		checkoutTest.payWithDebitOrCredit(new BigDecimal(30));
 		while(!readSuccessful) {
@@ -330,7 +346,7 @@ public class TestPaymentCards {
 		
 		checkoutTest.payWithBankNoteAndCoin(new BigDecimal(40));
 		station.banknoteInput.accept(banknote20);
-		station.banknoteInput.accept(banknote20);
+		//station.banknoteInput.accept(banknote20);
 		
 		assertFalse(checkoutTest.confirmPurchase());
 
