@@ -284,12 +284,16 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	public void validCoinDetected(CoinValidator validator, BigDecimal value) {
 		
 		insertedCoinValue = value;
+		amountOwed = amountOwed.subtract(value);
+		
 	}
 	
 	@Override
 	public void validBanknoteDetected(BanknoteValidator validator, Currency currency, int value) {
 		
 		insertedNoteValue = value;
+		amountOwed = amountOwed.subtract(new BigDecimal(value));
+		
 	}
 	
 	@Override
