@@ -10,6 +10,7 @@ import org.lsmr.selfcheckout.Barcode;
 import org.lsmr.selfcheckout.Card.CardData;
 import org.lsmr.selfcheckout.devices.AbstractDevice;
 import org.lsmr.selfcheckout.devices.CardReader;
+import org.lsmr.selfcheckout.devices.ElectronicScale;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
 import org.lsmr.selfcheckout.devices.observers.CardReaderObserver;
@@ -30,6 +31,14 @@ public class CardFromCardReader implements CardReaderObserver{
 	protected BigDecimal paymentTotal = new BigDecimal("0");
 	protected String memberNumber;
 	
+	/**
+    * Constructs a class CardFromCardReader that manages the functionalities
+    * of reading the card data from the customer's card.
+    * 
+    * @param SelfCheckoutStation
+    * 
+    * @param BankStub
+    */
 	public CardFromCardReader(SelfCheckoutStation station, BankStub b) {
 		this.station = station;
 		station.cardReader.attach(this);
@@ -42,12 +51,20 @@ public class CardFromCardReader implements CardReaderObserver{
 	}
 	
 
+	/**
+    * Resets total payment amount to zero.
+    */
 	public void resetPaymentTotal() {
 		paymentTotal = new BigDecimal("0");
 	}
 	
-
-	//DEBIT CARD METHOD
+	
+   /**
+    * Customer chooses to pay with debit card
+    * 
+    * @param CardData
+    * 			Debit card information
+    */
 	public boolean payWithDebit(CardData cardData) {
 		boolean paymentSuccessful = false;
 		BigDecimal funds = null;
@@ -65,8 +82,12 @@ public class CardFromCardReader implements CardReaderObserver{
 		return paymentSuccessful;
 	}
 	
-	//CREDIT CARD METHOD
-	//Takes card data and customer's desired payment amount with this payment method
+	/**
+    * Customer chooses to pay with credit card
+    * 
+    * @param CardData
+    * 			Credit card information
+    */
 	public boolean payWithCredit(CardData cardData) {
 		boolean paymentSuccessful = false;
 		BigDecimal funds = null;
@@ -85,7 +106,9 @@ public class CardFromCardReader implements CardReaderObserver{
 	}
 	
 	
-	//checks to see if an inserted card has been removed after payment
+	/**
+    * Check if the customer has removed their card
+    */
 	public void checkCardRemoved() {
 		if (cardInserted == true) {
 			station.cardReader.disable();
@@ -101,7 +124,12 @@ public class CardFromCardReader implements CardReaderObserver{
 	}
 	
 
-	//MEMBERSHIP CARD METHOD
+	/**
+    * Get the membership card from the customer
+    * 
+    * @param CardData
+    * 			Membership card information
+    */
 	public void membershipCard(CardData cardData) {
 		memberNumber = cardData.getNumber();
 	}
@@ -111,6 +139,15 @@ public class CardFromCardReader implements CardReaderObserver{
 	}
 
 
+	/**
+    * Reads the card data
+    * 
+    * @param CardReader
+    * 			Reader
+    * 
+    * @param CardData
+    * 			Debit card information
+    */
 	@Override
 	public void cardDataRead(CardReader reader, CardData data) {
 		cardData = data;
