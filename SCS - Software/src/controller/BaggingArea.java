@@ -111,6 +111,10 @@ public class BaggingArea implements ElectronicScaleObserver{
    
    }
 
+   public void setScanItem(ScanItem scanItem)
+   {
+	   this.theScanner = scanItem;
+   }
 
    // Simulate placing an item into bagging area
    public void placeItem(Item item) {
@@ -162,21 +166,24 @@ public class BaggingArea implements ElectronicScaleObserver{
 		   itemsToBeBagged.add(theScanner.getScanneditems().get(j));
 	   }
 	   
-	   if(itemsToBeBagged.isEmpty());
+	   if(itemsToBeBagged.isEmpty())
+	   {
 		   // no items to be bagged 
+		   throw new SimulationException("Trying to place an empty item into bagging area.");
+	   }
 	   else
 	   {
 		   try
 		   {
 			   itemTooLight = false;
-			   placeItem(itemsToBeBagged.get(0));
+			   placeItem(itemsToBeBagged.get(lengthList-1));
 			   if((currentWeight == previousWeight) && (itemsToBeBagged.get(0).getWeight() != 0))
 				   // itemWeight < sensitivity
 			   {
 				   itemTooLight = true;
 			   }
 			   // checks if this item is actually placed else throw exception
-			   checkIfItemPlaced(itemsToBeBagged.get(0));
+			   checkIfItemPlaced(itemsToBeBagged.get(lengthList -1));
 			   // checkIfItemPlaced(Item anItem) also enables the scanner ,
 			   
 			   
@@ -184,7 +191,7 @@ public class BaggingArea implements ElectronicScaleObserver{
 			   // and add it here
 			   
 			   
-			   itemsToBeBagged.remove(0); // removing item after bagging
+			   itemsToBeBagged.remove(lengthList -1); // removing item after bagging
 			   
 			   // throw exception if item weight < sensitivity or item == null
 		   }
