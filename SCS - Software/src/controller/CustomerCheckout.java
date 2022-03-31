@@ -1,4 +1,3 @@
-
 /******************************************************************************
  Program Authors:
      Dane Beliveau (Student ID: 30131121)
@@ -40,17 +39,6 @@ import org.lsmr.selfcheckout.products.*;
 public class CustomerCheckout{
 	
 	private SelfCheckoutStation station;
-<<<<<<< HEAD
-	
-	public CustomerCheckout(SelfCheckoutStation station) {
-		this.station = station;
-		beforeCheckout();
-	}
-	
-	
-	public void beforeCheckout() {
-		station.mainScanner.enable();
-=======
 	private CardFromCardReader cardLogic;
 	private PayCash cashLogic;
 	private BigDecimal amountOwed = new BigDecimal(0);
@@ -68,28 +56,11 @@ public class CustomerCheckout{
 	//Checkout station state before customer starts using the station
 	public void beforeStartPurchase() {
 		station.mainScanner.disable();
-
 		station.coinSlot.disable();
 		station.banknoteInput.disable();
 		station.cardReader.disable();
 	}
 	
-
-	
-	public void customerFinishAddingItem() {
-		station.mainScanner.disable();
-		station.coinSlot.enable();
-		station.banknoteInput.enable();
-		station.cardReader.enable();
-	}
-	
-	public void additionItemAfterPartialPayment() {
-		station.mainScanner.enable();
-		station.coinSlot.disable();
-		station.banknoteInput.disable();
-		station.cardReader.disable();
-	}
-
 	//Checkout station state after customer press start purchase button
 	public void startPurchase() {
 		station.mainScanner.enable();
@@ -184,7 +155,7 @@ public class CustomerCheckout{
 	 	}
 	 	
 	 	// Prints total
-	 	String endString = "Total: " + "$" + getAmountOwed().setScale(2, RoundingMode.HALF_EVEN);
+	 	String endString = "Total: " + "$" + this.scan.GetBillPrice().setScale(2, RoundingMode.HALF_EVEN);
 	 	for(char c : endString.toCharArray()) {
 	 		printer.print(c);
 	 	}

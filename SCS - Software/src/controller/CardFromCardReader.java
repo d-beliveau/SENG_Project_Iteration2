@@ -179,7 +179,6 @@ public class CardFromCardReader implements CardReaderObserver{
 			return discount;
 		}
 		
-
 		
 		//Set customer points
 		public void setPoints(String cardNum, int points) {
