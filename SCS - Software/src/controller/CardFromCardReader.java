@@ -22,29 +22,30 @@ public class CardFromCardReader implements CardReaderObserver{
 	private CardData cardData;
 	private String cardNumber;
 	private String cardType;
-	private boolean success = false;
-	private BankStub bank = new BankStub();
 	
+	private boolean cardInserted = false;
+	private boolean success = false;
+	private BankStub bank;
 	protected BigDecimal paymentAmount = new BigDecimal("0");
 	protected BigDecimal paymentTotal = new BigDecimal("0");
 	protected String memberNumber;
 	
-	public CardFromCardReader(SelfCheckoutStation station) {
+	public CardFromCardReader(SelfCheckoutStation station, BankStub b) {
 		this.station = station;
 		station.cardReader.attach(this);
+		
+		bank = b;
 	}
 	
 	public BigDecimal getPaymentTotal() {
 		return paymentTotal;
 	}
 	
-	public BigDecimal getPaymentAmount() {
-		return paymentAmount;
-	}
-	
+
 	public void resetPaymentTotal() {
 		paymentTotal = new BigDecimal("0");
 	}
+	
 
 	//DEBIT CARD METHOD
 	public boolean payWithDebit(CardData cardData) {
@@ -83,10 +84,20 @@ public class CardFromCardReader implements CardReaderObserver{
 		return paymentSuccessful;		
 	}
 	
+	
+	//checks to see if an inserted card has been removed after payment
+	public void checkCardRemoved() {
+		if (cardInserted == true) {
+			station.cardReader.disable();
+		}
+		
+	}
+	
 	public void reset() {
 		cardNumber = null;
 		cardData = null;
 		success = false;
+		paymentAmount = new BigDecimal("0");
 	}
 	
 
@@ -95,11 +106,6 @@ public class CardFromCardReader implements CardReaderObserver{
 		memberNumber = cardData.getNumber();
 	}
 	
-
-	public BankStub getBank() {
-		return bank;
-	}
-
 	public void setBank(BankStub bank) {
 		this.bank = bank;
 	}
@@ -126,6 +132,7 @@ public class CardFromCardReader implements CardReaderObserver{
 		if (success == true) {
 			paymentTotal = paymentTotal.add(paymentAmount);
 		}
+		checkCardRemoved();
 		reset();
 	}
 	
@@ -140,13 +147,18 @@ public class CardFromCardReader implements CardReaderObserver{
 	public void disabled(AbstractDevice<? extends AbstractDeviceObserver> device) {}
 
 	@Override
-	public void cardRemoved(CardReader reader) {}
+	public void cardRemoved(CardReader reader) {
+		cardInserted = false;
+		station.cardReader.enable();
+	}
 
 	@Override
 	public void cardTapped(CardReader reader) {}
 	
 	@Override
-	public void cardInserted(CardReader reader) {}
+	public void cardInserted(CardReader reader) {
+		cardInserted = true;
+	}
 
 	@Override
 	public void cardSwiped(CardReader reader) {}
