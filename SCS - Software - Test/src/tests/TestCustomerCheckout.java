@@ -1,35 +1,21 @@
-/******************************************************************************
- Program Authors:
-     Dane Beliveau (Student ID: 30131121)
-     Jesse Desmarais (Student ID: 00292117)
-     Ekhonmu Egbase (Student ID: 30102937)
-     Junyi Li (Student ID: 30113375)
-     Richi Patel (Student ID: 30125178)
-     Kevin Van (Student ID: 30087130)
- E-mails:
-     dane.beliveau@ucalgary.ca
-     jesse.desmarais@ucalgary.ca
-     ekhonmu.egbase@ucalgary.ca
-     junyi.li@ucalgary.ca
-     richi.patel@ucalgary.ca
-     kevin.van@ucalgary.ca
- Class: SENG 300
- Instructor: Robert Walker
- Date: 20 March 2022
- Assignment: Project, Iteration 01
- ******************************************************************************/
-
 package tests;
 
 import static org.junit.Assert.*;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.lsmr.selfcheckout.Banknote;
+import org.lsmr.selfcheckout.Barcode;
+import org.lsmr.selfcheckout.BarcodedItem;
+import org.lsmr.selfcheckout.Numeral;
 import org.lsmr.selfcheckout.devices.DisabledException;
 import org.lsmr.selfcheckout.devices.OverloadException;
 import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.devices.SimulationException;
+import org.lsmr.selfcheckout.products.BarcodedProduct;
 
+import controller.BankStub;
 import controller.CustomerCheckout;
 import controller.PayCash;
 import controller.ScanItem;
@@ -42,6 +28,29 @@ public class TestCustomerCheckout {
     private CustomerCheckout checkoutTest;
     private SelfCheckoutStation station;
     private Currency currency;
+    private ScanItem scanItem;
+
+	
+	   //Numerals
+	 private Numeral[] soupCode = new Numeral[] {Numeral.valueOf((byte)0b000)};
+	 private Numeral[] doritoCode = new Numeral[] {Numeral.valueOf((byte)0b111)};
+	
+	 //Barcodes
+	 private Barcode soupBar = new Barcode(soupCode);
+	 private Barcode doritoBar = new Barcode(doritoCode);
+	
+	 //Price
+	 private BigDecimal soupPrice = new BigDecimal(3.00);
+	 private BigDecimal doritoPrice = new BigDecimal(2.00);
+	 
+	 //Items
+	 private BarcodedItem soupItem;
+	 private BarcodedItem doritoItem;
+	
+	 //Products
+	 private BarcodedProduct soupProd;
+	 private BarcodedProduct doritoProd;
+	 
 
     @Before
     public void setup() {
@@ -50,7 +59,18 @@ public class TestCustomerCheckout {
         int[] ints = {5, 10, 20, 50};
         BigDecimal[] decs = {new BigDecimal(".05"), new BigDecimal(".1"), new BigDecimal(".25")};
         station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
-        checkoutTest = new CustomerCheckout(station);
+        checkoutTest = new CustomerCheckout(station, new BankStub());
+        scanItem = new ScanItem(station);
+        
+        checkoutTest.setScanItemController(scanItem);
+    
+        //Set-up items
+        this.soupItem = new BarcodedItem(soupBar, 50);
+        this.doritoItem = new BarcodedItem(doritoBar, 50);
+
+        //Set-up products
+        this.soupProd = new BarcodedProduct(soupBar,"Soup",soupPrice, 30);
+        this.doritoProd = new BarcodedProduct(doritoBar,"Soup",doritoPrice, 30);
     }
     
     /*Test whether certain devices are disabled 
@@ -81,7 +101,7 @@ public class TestCustomerCheckout {
      * device when customer choose form of payment to be cash */
     @Test
     public void testPayWithBankNoteAndCoin(){
-	   	 checkoutTest.payWithBankNoteAndCoin();
+	   	 checkoutTest.payWithBankNoteAndCoin(new BigDecimal(0));
 		 assertTrue(station.mainScanner.isDisabled());
 	     assertTrue(station.cardReader.isDisabled());
 	     assertFalse(station.coinSlot.isDisabled());
@@ -110,18 +130,23 @@ public class TestCustomerCheckout {
     @Test
     public void testConfirmPurchase() throws DisabledException, OverloadException {
    
-    	BigDecimal moneyOwed;
+    	BigDecimal moneyOwed = new BigDecimal(20);
+    	checkoutTest.setAmountOwed(moneyOwed);
     	
-    	moneyOwed = new BigDecimal(20);
-    	assertFalse(checkoutTest.confirmPurchase(moneyOwed));
+    	BigDecimal totalPayment = new BigDecimal(5);
+    	checkoutTest.setTotalPayment(totalPayment);
+    	assertFalse(checkoutTest.confirmPurchase());
+    
+    	
+    	totalPayment = new BigDecimal(20);
+     	checkoutTest.setTotalPayment(totalPayment);
+    	assertTrue(checkoutTest.confirmPurchase());
     	
     	
-     	moneyOwed = new BigDecimal(0);
-    	assertTrue(checkoutTest.confirmPurchase(moneyOwed));
+    	totalPayment = new BigDecimal(40);
+    	checkoutTest.setTotalPayment(totalPayment);
+    	assertTrue(checkoutTest.confirmPurchase());
     	
-    	
-    	moneyOwed = new BigDecimal(-1);
-    	assertTrue(checkoutTest.confirmPurchase(moneyOwed));
     	
     	//After all items paid for disable all relevant devices
 		 assertTrue(station.mainScanner.isDisabled());
@@ -135,10 +160,38 @@ public class TestCustomerCheckout {
     /*Test whether you can add more item to scan*/
     @Test
     public void testAddItemToScanner() {
+    	checkoutTest.addItemToScanner();
 		 assertFalse(station.mainScanner.isDisabled());
 	     assertTrue(station.cardReader.isDisabled());
 	     assertTrue(station.coinSlot.isDisabled());
 	     assertTrue(station.banknoteInput.isDisabled());
+    }
+    
+    
+    //Test if receipt prints the correct message
+    @Test
+    public void testPrinterReceipt() {
+    	
+    	scanItem.addProduct(soupProd);
+    	scanItem.addProduct(doritoProd);
+    	
+ 
+    	scanItem.addScanneditems(doritoItem);
+    	scanItem.addScanneditems(soupItem);
+
+  
+    	//Set amount owed and total payment
+    	checkoutTest.setAmountOwed(new BigDecimal(5));
+    	checkoutTest.setTotalPayment(new BigDecimal(5));
+    	
+    	//Prints Items onto the printer
+    	checkoutTest.confirmPurchase();
+    
+    	station.printer.cutPaper();
+    
+    	//Check if CustomerCheckout receipt message match the one from printer 	
+    	Assert.assertEquals(checkoutTest.getReceiptMessage(), 		station.printer.removeReceipt());
+    	
     }
     
     
