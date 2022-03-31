@@ -19,37 +19,28 @@
  Assignment: Project, Iteration 01
  ******************************************************************************/
 
-package tests;
+
+// some tests make the program stop for a few seconds
+package controller;
 
 import org.lsmr.selfcheckout.*;
 import org.lsmr.selfcheckout.devices.*;
 
 import controller.BaggingArea;
-import controller.ScanItem;
 
 import org.junit.Before;
 import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import static org.junit.Assert.*;
 
 // Tests suite for BaggingArea
 public class TestBaggingArea {
 	private BaggingArea area;
 	private SelfCheckoutStation station;
-	
-	
-    //Numerals
-    private Numeral[] soupCode = new Numeral[] {Numeral.valueOf((byte)0b000)};
-    private Numeral[] doritoCode = new Numeral[] {Numeral.valueOf((byte)0b111)};
-
-	 //Barcodes
-    private Barcode soupBar = new Barcode(soupCode);
-    private Barcode doritoBar = new Barcode(doritoCode);
-
-    //Items
-    private BarcodedItem soupItem;
-    private BarcodedItem doritoItem;
 
 	@Before
 	public void setup() {
@@ -58,13 +49,6 @@ public class TestBaggingArea {
 		BigDecimal[] decs = {new BigDecimal(.05), new BigDecimal(.1), new BigDecimal(.25)};
 		station = new SelfCheckoutStation(currency, ints, decs, 500, 1);
 		area = new BaggingArea(station);
-		
-		
-		 //Set-up items
-        this.soupItem = new BarcodedItem(soupBar, 50);
-        this.doritoItem = new BarcodedItem(doritoBar, 50);
-		
-		
 	}
 
 	@Test
@@ -186,9 +170,88 @@ public class TestBaggingArea {
 	}
 	
 	@Test
-	public void testFailToPlaceItem() {
-		
+	public void testItemNotAddedAfterScanning()
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		ScanItem scanItem = new ScanItem(station);
+		scanItem.scanAnItem(item);
+		assertTrue(station.mainScanner.isDisabled());
 	}
 	
+	@Test
+	public void testItemAddedAfterScanning() throws InterruptedException, OverloadException
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		ScanItem scanItem = new ScanItem(station);
+		area.setScanItem(scanItem);
+		scanItem.scanAnItem(item);
+		area.bagItemAfterScanning();
+		assertFalse(station.mainScanner.isDisabled());
+	}
+	
+	@Test (expected = SimulationException.class)
+	public void testNotScanningBeforeBagging() throws OverloadException
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		// this item has not been scanned 
+
+		area.bagItemAfterScanning();
+
+	}
+	
+	@Test 
+	public void testItemTooLight() throws OverloadException
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 0.00005);
+		ScanItem scanItem = new ScanItem(station);
+		area.setScanItem(scanItem);
+		scanItem.scanAnItem(item);
+		area.bagItemAfterScanning();
+		assertTrue(area.isItemTooLight());
+
+	}
+	
+	@Test
+	public void addingCustomerBag()
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		try {
+			area.addCustomerBag();
+			area.placeItem(item);
+			area.checkIfItemPlaced(item);
+			assertEquals(area.getScale().getCurrentWeight(), 3.0, 0.1); 
+			// 0.1 handles the randomness when getting current weight of scale 
+		} catch(Exception e) {
+			fail("there should not have been an exception");
+		}
+	}
+	
+	@Test
+	public void removingCustomerBag()
+	{
+		Numeral[] nums = {Numeral.valueOf((byte) 1), Numeral.valueOf((byte) 2), Numeral.valueOf((byte) 3), Numeral.valueOf((byte) 4)};
+		Barcode barcode = new Barcode(nums);
+		BarcodedItem item = new BarcodedItem(barcode, 3.0);
+		try {
+			area.addCustomerBag();
+			area.placeItem(item);
+			area.checkIfItemPlaced(item);
+			area.removeCustomerBag();
+			assertEquals(area.getScale().getCurrentWeight(), 3.0, 0.1); 
+			// 0.1 handles the randomness when getting current weight of scale 
+		} catch(Exception e) {
+			fail("there should not have been an exception");
+		}
+	}
 	
 }
