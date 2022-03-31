@@ -54,7 +54,7 @@ public class ScanItem implements BarcodeScannerObserver{
 	private BigDecimal billprice;
 	private BigDecimal productprice;
 	private BarcodedProduct p;
-	private double expectedWeight = 0.0;
+//	private double expectedWeight = 0.0;
 	
 	
 	private SelfCheckoutStation station;
@@ -69,9 +69,9 @@ public class ScanItem implements BarcodeScannerObserver{
 	//Construct scanner observer from checkout station
 	public boolean scanAnItem(BarcodedItem item) {
 		
+		Scanneditems.add(item);
 		station.mainScanner.scan(item);
 		if (this.scanResult() == true) {
-			Scanneditems.add(item);
 			
 			//!!! COMMENTED THIS LINE OUT FOR TESTING !!!
 			//scanBaggingItem(item);
@@ -79,15 +79,17 @@ public class ScanItem implements BarcodeScannerObserver{
 			return true;
 			
 		} else {
+			Scanneditems.remove(item);
+			scanAnItem(item); // in case of a failed scan
 			return false;
 		}
 		
 		
 	}
 	
-	public double getExpectedWeight() {
-		return expectedWeight;
-	}
+//	public double getExpectedWeight() {
+//		return expectedWeight;
+//	}
 	
 	public void setItemWeightMap(Dictionary<Barcode, Double> itemWeightMap) {
 		this.itemWeightMap = itemWeightMap;
@@ -135,7 +137,7 @@ public class ScanItem implements BarcodeScannerObserver{
 	public void barcodeScanned(BarcodeScanner barcodeScanner, Barcode barcode) {
 		// TODO Auto-generated method stub
 		this.scanned = true;
-		expectedWeight = expectedWeight + itemWeightMap.get(barcode);
+//		expectedWeight = expectedWeight + itemWeightMap.get(barcode);
 		station.mainScanner.disable();
 		
 	}
@@ -185,4 +187,3 @@ public class ScanItem implements BarcodeScannerObserver{
 	}
 	
 }
-
