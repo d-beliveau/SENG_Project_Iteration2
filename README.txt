@@ -29,4 +29,6 @@ Note: The last feild is GitHub username.
 
 =======================================================================
 
+A Tale of Two Iterations
+
 It was the best of times, it was the worst of times, it was the age of proper encapsulation, it was the age of poorly chosen variable names, it was the epoch of hoping your code would work the first time you tested it, it was the season of good project management, until it was the season of the last minute grind to submit before midnight, it was the spring of ambition, until it was the winter of accepting we've done a good enough job and we're out of time, we had everything before us, we had nothing before us, we were all going direct to Oracle, the period was so far like the winter semester of last year, that some of its noisiest stakeholders insisted on its being received, for efficient or for inefficient, in the superlative degree of comparison to other groups' code only.
