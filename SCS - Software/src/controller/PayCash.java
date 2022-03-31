@@ -1,24 +1,3 @@
-/******************************************************************************
-Program Authors:
-    Dane Beliveau (Student ID: 30131121)
-    Jesse Desmarais (Student ID: 00292117)
-    Ekhonmu Egbase (Student ID: 30102937)
-    Junyi Li (Student ID: 30113375)
-    Richi Patel (Student ID: 30125178)
-    Kevin Van (Student ID: 30087130)
-E-mails:
-    dane.beliveau@ucalgary.ca
-    jesse.desmarais@ucalgary.ca
-    ekhonmu.egbase@ucalgary.ca
-    junyi.li@ucalgary.ca
-    richi.patel@ucalgary.ca
-    kevin.van@ucalgary.ca
-Class: SENG 300
-Instructor: Robert Walker
-Date: 20 March 2022
-Assignment: Project, Iteration 01
-******************************************************************************/
-
 package controller;
 
 import java.math.BigDecimal;
@@ -34,7 +13,9 @@ import org.lsmr.selfcheckout.devices.observers.BanknoteValidatorObserver;
 import org.lsmr.selfcheckout.devices.observers.CoinStorageUnitObserver;
 import org.lsmr.selfcheckout.devices.observers.CoinValidatorObserver;
 
-// Control software for 'customer pays with coin,' 'customer pays with banknote,' and 'give customer change' use cases
+/**
+ * Control software for 'customer pays with coin,' 'customer pays with banknote,' and 'give customer change' use cases *
+ */
 public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver, /*CoinDispenserObserver, BanknoteDispenserObserver,
 	*/CoinStorageUnitObserver, BanknoteStorageUnitObserver{
 	
@@ -45,12 +26,16 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	private BigDecimal insertedCoinValue = new BigDecimal(0);
 	private int insertedNoteValue;
 	
-	// Not sure if it's a good idea to set these as class fields. It makes it easier since a method can only return one type.
-	//Change to getters and setters
 	public ArrayList<Integer> billsDue;
 	public ArrayList<BigDecimal> coinsDue;
 	
-	// Constructor, sets 'scs' and 'amountOwed' based off parameters
+	/**
+	 *  Sets 'scs' and 'amountOwed' based off parameters
+	 * @param station
+	 * 		Refers to the self-checkout machine
+	 * @param amount
+	 * 		Amount to pay
+	 */
 	public PayCash(SelfCheckoutStation station, BigDecimal amount){
 		
 		scs = station;
@@ -77,7 +62,9 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	}
 	
 
-	// Checkout controller
+	/**
+	 * Controls the checkout system
+	 */
 	public void checkoutController() {
 		
 		scs.banknoteInput.enable();
@@ -90,16 +77,24 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 		System.out.println("Checkout complete");
 	}
 	
-	// Prompt for cash
-	// Returns cash entered
+	/**
+	 *  Prompt for cash
+	 * @return cash paid
+	 */
 	public BigDecimal promptCash() {
 		System.out.println("Please enter $" + amountOwed);
-		// Set up slot
 		BigDecimal cashPaid;
-		return null; //cashPaid;
+		return null;
 	}
 	
-	// Compares totalPayment (money entered) to amountOwed (cost of goods)
+	/**
+	 *  Compares totalPayment (money entered) to amountOwed (cost of goods)
+	 * @param paid
+	 * 			Total money paid
+	 * @param total
+	 * 			Total amount owed
+	 * @return true if sufficient money has been paid
+	 */
 	public Boolean checkEnough(BigDecimal paid, BigDecimal total) {
 		
 		Boolean enough;
@@ -132,8 +127,9 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	}	
 	
 	
-	// Delivers change to customer
-	// void return type is tentative
+	/**
+	 *  Delivers change to customer
+	 */
 	public void deliverChange() {
 		// Call banknote dispenser
 		// Call coin dispenser
@@ -200,7 +196,12 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	}
 	
 	
-	// Separates change due in coins from change due in banknotes
+	/**
+	 * Separates change due in coins from change due in banknotes
+	 * @param change
+	 * 			Change to be given back to the customer
+	 * @return
+	 */
 	public ArrayList<BigDecimal> separateCoinsFromBills(BigDecimal change) {
 	
 		double changeDouble = change.doubleValue();
@@ -214,7 +215,13 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 		return changeReturn;
 	}
 	
-	// Calculates change due in banknotes by looping through a banknotes assignment
+	/**
+	 *  Calculates change due in banknotes by looping through a banknotes assignment
+	 * @param change
+	 * 		Change to be given back to the customer
+	 * @return
+	 * 		List of banknote demoninations
+	 */
 	public ArrayList<Integer> calcBillsChange(BigDecimal change) {
 		
 		// Convert change to a double
@@ -244,8 +251,12 @@ public class PayCash implements CoinValidatorObserver, BanknoteValidatorObserver
 	}
 	
 	
-	// Calculates change due in coins by looping through a coin assignment
-	// Converts BigDecimal to double for calculation and the converts back
+	/**
+	 *  Calculates change due in coins by looping through a coin assignment 
+	 *  (Converts BigDecimal to double for calculation and the converts back)
+	 * @param change
+	 * @return
+	 */
 	public ArrayList<BigDecimal> calcCoinsChange(BigDecimal change) {
 		
 		// Convert change to a double

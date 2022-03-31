@@ -30,22 +30,40 @@ public class MembershipCard implements CardReaderObserver{
 		station.cardReader.attach(this);
 	}
 	
-	//Set the hash table of loyalty point map
+	/**
+	 * Set the hash table of loyalty point map
+	 * @param map
+	 */
 	public void  setLoyaltyPointMap(HashMap<String, Integer> map) {
 		loyaltyPointMap = map;
 	}
 	
-	//Set customer points
+	/**
+	 * Set customer points
+	 * @param cardNum
+	 * 			Card's number
+	 * @param points
+	 * 			Amount of points in the card
+	 */
 	public void setPoints(String cardNum, int points) {
 		loyaltyPointMap.put(cardNum, points);
 	}
 	
-	//Get the customer points
+	/**
+	 * Get the customer points
+	 * @return Loyalty points
+	 */
 	public int getPoints() {
 		return loyaltyPointMap.get(cardNumber);
 	}
 	
-	//Return the cash discount you get
+	/**
+	 * Return the cash discount you get
+	 * @param points
+	 * 		(int) Amount of points
+	 * @return discount
+	 * 			Equivalent discount
+	 */
 	public int cashDiscount(int points) {
 		int userPoint = loyaltyPointMap.get(cardNumber);
 		int discount = userPoint/100;
@@ -87,13 +105,11 @@ public class MembershipCard implements CardReaderObserver{
 	@Override
 	public void cardTapped(CardReader reader) {
 		// Ignore
-		
 	}
 
 	@Override
 	public void cardSwiped(CardReader reader) {
 		// Ignore
-		
 	}
 
 
