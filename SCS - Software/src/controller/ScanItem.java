@@ -97,6 +97,10 @@ public class ScanItem implements BarcodeScannerObserver{
 		return Scanneditems;
 	}
 	
+	public void addScanneditems(BarcodedItem someItem) {
+		Scanneditems.add(someItem);
+	}
+	
 	public Dictionary<Barcode, BarcodedProduct> getProducts() {
 		return Products;
 	}
@@ -183,6 +187,8 @@ public class ScanItem implements BarcodeScannerObserver{
 	public void SetBillPrice(BigDecimal price) {
 		billprice = price;
 	}
+	
+
 	
 }
 /**
