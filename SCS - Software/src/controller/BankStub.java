@@ -35,19 +35,7 @@ public class BankStub {
 		return debitFundsAvailableMap.get(cardNumber);
 	}
 	
-	//to get a randomized amount of funds available (for testing if needed)
-	public BigDecimal getFundsRemaining(String cardNumber) {
-		//obtain information from third party financial institution
-		
-		//obtaining funds remaining
-		availableFunds = new BigDecimal(((new Random().nextDouble() * (creditLimit)) + 0.01)).setScale(2, RoundingMode.HALF_DOWN);
-		creditLimitAvailable.put(cardNumber, availableFunds);
-		return availableFunds;
-	}
 	
-	public void makePurchase(String cardNumber, BigDecimal amount) {
-		availableFunds.subtract(amount);
-	}
 	
 
 	/*
