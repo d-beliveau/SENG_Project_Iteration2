@@ -6,6 +6,8 @@ SENG 300 W2022, University of Calgary
 Code base from group project iteration 1, Team 16.
 Implements Hardware v2.0
 
+Note: PayCash has 100% test coverage for the actual class, the missed coverage is just the observer methods we had to import but are not using.
+
 Directory:
 SCS - Software            (control software)
 SCS - Software - Test     (JUnit test suite)
